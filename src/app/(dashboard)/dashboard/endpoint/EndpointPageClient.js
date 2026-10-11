@@ -409,31 +409,47 @@ console.log(res.choices[0].message.content);`;
                     </code>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => toggleKeyVisibility(k.id)}
-                      className="px-2 py-1 text-[11px] text-[#A1A1A6] hover:text-[#E5C378] cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-mono text-[#A1A1A6] hover:text-[#E5C378] bg-[#141416] hover:bg-[#1A1A1E] border border-[#23242A] hover:border-[#C5A880]/50 transition-all cursor-pointer"
+                      title={isVisible ? "Hide API key" : "Show full API key"}
                     >
+                      <span className="material-symbols-outlined text-[13px]">
+                        {isVisible ? "visibility_off" : "visibility"}
+                      </span>
                       {isVisible ? "Hide" : "Show"}
                     </button>
                     <button
                       onClick={() => copy(k.key, k.id)}
-                      className="px-2 py-1 text-[11px] text-[#A1A1A6] hover:text-[#E5C378] cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-mono text-[#A1A1A6] hover:text-[#E5C378] bg-[#141416] hover:bg-[#1A1A1E] border border-[#23242A] hover:border-[#C5A880]/50 transition-all cursor-pointer"
+                      title="Copy API key"
                     >
+                      <span className="material-symbols-outlined text-[13px]">
+                        {copied === k.id ? "check" : "content_copy"}
+                      </span>
                       {copied === k.id ? "Copied" : "Copy"}
                     </button>
                     <button
                       onClick={() => handleToggleKey(k.id, isPaused)}
-                      className="px-2 py-1 text-[11px] text-[#68686E] hover:text-[#F5F5F7] cursor-pointer"
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-mono border transition-all cursor-pointer ${
+                        isPaused
+                          ? "text-[#10b981] bg-[#10b981]/10 border-[#10b981]/30 hover:bg-[#10b981]/20 hover:border-[#10b981]/60"
+                          : "text-[#A1A1A6] hover:text-[#F5F5F7] bg-[#141416] hover:bg-[#1A1A1E] border-[#23242A] hover:border-[#353642]"
+                      }`}
+                      title={isPaused ? "Resume API key" : "Pause API key"}
                     >
+                      <span className="material-symbols-outlined text-[13px]">
+                        {isPaused ? "play_arrow" : "pause"}
+                      </span>
                       {isPaused ? "Resume" : "Pause"}
                     </button>
                     <button
                       onClick={() => handleDeleteKey(k.id)}
-                      className="p-1 text-[#68686E] hover:text-red-400 cursor-pointer ml-1"
+                      className="inline-flex items-center justify-center p-1.5 text-[#68686E] hover:text-[#FF6B6B] bg-[#141416] hover:bg-[#2A1517] border border-[#23242A] hover:border-[#522226] transition-all cursor-pointer ml-0.5"
                       title="Delete key"
                     >
-                      <span className="material-symbols-outlined text-[16px]">delete</span>
+                      <span className="material-symbols-outlined text-[14px]">delete</span>
                     </button>
                   </div>
                 </div>

@@ -5,8 +5,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import PropTypes from "prop-types";
 import ProviderIcon from "@/shared/components/ProviderIcon";
-import HeaderMenu from "@/shared/components/HeaderMenu";
-import HeaderLanguage from "@/shared/components/HeaderLanguage";
 import DonateModal from "@/shared/components/DonateModal";
 import { useHeaderSearchStore } from "@/store/headerSearchStore";
 import { translate } from "@/i18n/runtime";
@@ -67,17 +65,6 @@ export default function Header({ onMenuClick, showMenuButton = true }) {
     };
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      const res = await fetch("/api/auth/logout", { method: "POST" });
-      if (res.ok) {
-        window.location.assign("/login");
-      }
-    } catch (err) {
-      console.error("Failed to logout:", err);
-    }
-  };
-
   return (
     <header className="shrink-0 flex items-center justify-between gap-3 px-6 lg:px-8 border-b border-[#222226] bg-[#09090A] text-[#F5F5F7] z-20 h-[69px]">
       {/* Mobile menu button */}
@@ -120,8 +107,6 @@ export default function Header({ onMenuClick, showMenuButton = true }) {
           </div>
         )}
         <HeaderSearch />
-        <HeaderLanguage />
-        <HeaderMenu onLogout={handleLogout} />
       </div>
       <DonateModal isOpen={donateOpen} onClose={() => setDonateOpen(false)} />
     </header>

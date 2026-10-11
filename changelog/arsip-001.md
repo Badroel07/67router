@@ -4,6 +4,40 @@ Bagian dari sistem changelog terpecah per batas ukuran. Indeks lengkap: [`CHANGE
 
 ## Riwayat Perubahan
 
+### [2026-10-11] - Upgrade Desain Tombol Aksi API Key & Hapus Header Icons (v1.0.12)
+- **Kategori**: UI/UX | Styling | Clean Up
+- **File & Baris Terkait**:
+  - `src/app/(dashboard)/dashboard/endpoint/EndpointPageClient.js:412-455` (mengubah tombol teks biasa Show/Copy/Pause/Delete menjadi mini button berbingkai dengan ikon Material Symbols, font mono, indikator status aktif/pause, dan hover gold/crimson)
+  - `src/shared/components/Header.js:8-9,68-77,122-125` (menghapus komponen bendera bahasa `HeaderLanguage` dan menu `HeaderMenu` dari header bar)
+  - `package.json:3`, `cli/package.json:3`, `cli/app/package.json:3` (kenaikan versi patch ke v1.0.12)
+- **Deskripsi Perubahan**:
+  - Tombol aksi API key (Show, Copy, Pause/Resume, Delete) kini tampil premium bergaya pill-box dark obsidian dengan border `#23242A`, ikon Material Symbols (`visibility`, `content_copy`, `pause`/`play_arrow`, `delete`), latar `#141416`, dan hover efek halus.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Tombol aksi ditingkatkan dan divalidasi.
+
+### [2026-10-11] - Hapus Komponen Pemilih Tema Light/Dark/System (v1.0.11)
+- **Kategori**: UI/UX | Clean Up
+- **File & Baris Terkait**:
+  - `src/app/(dashboard)/dashboard/profile/page.js:770-785` (menghapus tombol toggle switch tema light/dark/system pada kartu Local Mode di halaman profile)
+  - `src/shared/components/HeaderMenu.js:5,41` (membersihkan unused hook useTheme)
+  - `package.json:3`, `cli/package.json:3`, `cli/app/package.json:3` (kenaikan versi patch ke v1.0.11)
+- **Deskripsi Perubahan**:
+  - Menghapus kontrol pergantian tema light/dark/system di dashboard profile karena tema aplikasi sudah permanen dark obsidian.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Komponen pemilih tema dihapus, divalidasi, dan di-build.
+
+### [2026-10-11] - Redesain Tombol Danger & Shutdown Sesuai Tema Dark Obsidian (v1.0.10)
+- **Kategori**: UI/UX | Styling
+- **File & Baris Terkait**:
+  - `src/shared/components/Button.js:10-11` (menambahkan varian `dangerOutline` dan memperbarui `danger` dengan palet gelap obsidian `#2A1517`, hover `#3D1C20`, teks `#FF6B6B`, border `#3A1D20`/`#FF6B6B`)
+  - `src/app/(dashboard)/dashboard/profile/page.js:1626-1634` (mengganti tombol Shutdown dari class red-500/red-50 menjadi `variant="dangerOutline"`)
+  - `src/app/(dashboard)/dashboard/media-providers/combo/[id]/page.js:258` (mengganti tombol Delete combo menjadi `variant="dangerOutline"`)
+  - `package.json:3`, `cli/package.json:3`, `cli/app/package.json:3` (kenaikan versi patch ke v1.0.10)
+- **Deskripsi Perubahan**:
+  - Mengeliminasi warna merah default terang (`hover:bg-red-50 hover:border-red-300`) pada tombol shutdown/danger yang bentrok dengan tema gelap, menggantikannya dengan nuansa obsidian wine dark crimson yang selaras dengan tema UI 67Router.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Perubahan styling diaplikasikan, di-build, dan diverifikasi.
+
 ### [2026-10-11] - Batasi Tinggi Baris Routing & Recent Requests ke 460px (v1.0.9)
 - **Kategori**: UI/UX | Refactor | Layout
 - **File & Baris Terkait**:

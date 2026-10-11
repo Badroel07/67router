@@ -7,7 +7,8 @@ const variants = {
   secondary: "bg-[#141416] hover:bg-[#1C1C1F] text-[#F5F5F7] border border-[#2E2E33] hover:border-[#C5A880] disabled:opacity-50",
   outline: "bg-transparent border border-[#222226] text-[#F5F5F7] hover:bg-[#141416] hover:border-[#C5A880]",
   ghost: "bg-transparent text-[#A1A1A6] hover:bg-[#141416] hover:text-[#F5F5F7]",
-  danger: "bg-red-600 hover:bg-red-700 text-white disabled:opacity-50",
+  danger: "bg-[#2A1517] hover:bg-[#3D1C20] text-[#FF6B6B] border border-[#522226] hover:border-[#FF6B6B]/40 disabled:opacity-50",
+  dangerOutline: "bg-transparent border border-[#3A1D20] text-[#FF6B6B] hover:bg-[#2A1517] hover:border-[#FF6B6B]/60 disabled:opacity-50",
   success: "bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50",
 };
 
