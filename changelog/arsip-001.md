@@ -4,6 +4,16 @@ Bagian dari sistem changelog terpecah per batas ukuran. Indeks lengkap: [`CHANGE
 
 ## Riwayat Perubahan
 
+### [2026-10-11] - Pembaruan Dokumentasi Paket npm CLI (cli/README.md)
+- **Kategori**: Documentation | Changed
+- **File & Baris Terkait**:
+  - `cli/README.md:1-139` (penyelarasan total dokumentasi paket npm CLI `67router` agar mencerminkan identitas, fitur unggulan zero-vulnerability, token saver RTK, Agent Skills `@antislop-code`, automated OpenCode discovery, dual binary CLI command, dan referensi repositori GitHub `Badroel07/9router`)
+- **Deskripsi Perubahan**:
+  - Memperbarui `cli/README.md` yang merupakan sumber tampilan deskripsi resmi pada registry npm (`https://www.npmjs.com/package/67router`).
+  - Menghapus referensi usang ke 9router upstream original (docker upstream, link repo lama), dan menggantinya dengan informasi komprehensif terkait 67Router.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - `cli/README.md` telah diselaraskan dengan identitas dan repositori 67Router.
+
 ### [2026-10-11] - Perbaikan Stabilitas System Tray Windows & Crash Recovery Background Mode (v1.0.6)
 - **Kategori**: Bug Fix | Windows | Tray
 - **File & Baris Terkait**:
