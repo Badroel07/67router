@@ -368,12 +368,7 @@ export default function ProvidersPage() {
   const hiddenApikeyCount = apikeyEntries.length - APIKEY_INITIAL_VISIBLE;
 
   if (loading) {
-    return (
-      <div className="flex flex-col gap-8">
-        <CardSkeleton />
-        <CardSkeleton />
-      </div>
-    );
+    return <ProvidersPageSkeleton />;
   }
 
   const hasAnyResult =
@@ -689,6 +684,86 @@ export default function ProvidersPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function ProviderCardSkeleton() {
+  return (
+    <div className="h-[68px] bg-[#0F0F10] border border-[#222226] p-3 flex items-center justify-between">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="size-8 bg-[#1c1c24] animate-pulse shrink-0" />
+        <div className="space-y-1.5 min-w-0">
+          <div className="h-3.5 w-24 bg-[#1c1c24] animate-pulse" />
+          <div className="h-2.5 w-14 bg-[#181820] animate-pulse" />
+        </div>
+      </div>
+      <div className="w-8 h-4 bg-[#1c1c24] animate-pulse shrink-0" />
+    </div>
+  );
+}
+
+function ProvidersPageSkeleton() {
+  return (
+    <div className="flex min-w-0 flex-col gap-6 px-1 sm:px-0">
+      <div className="flex items-center justify-end">
+        <div className="h-8 w-28 bg-[#141416] border border-[#222226] animate-pulse" />
+      </div>
+
+      {/* Custom Providers */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="h-5 w-64 bg-[#1c1c24] animate-pulse" />
+          <div className="flex gap-2">
+            <div className="h-8 w-36 bg-[#141416] border border-[#222226] animate-pulse" />
+            <div className="h-8 w-36 bg-[#141416] border border-[#222226] animate-pulse" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <ProviderCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+
+      {/* OAuth Providers */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="h-5 w-40 bg-[#1c1c24] animate-pulse" />
+          <div className="h-8 w-24 bg-[#141416] border border-[#222226] animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          {[...Array(8)].map((_, i) => (
+            <ProviderCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+
+      {/* Free Tier Providers */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="h-5 w-44 bg-[#1c1c24] animate-pulse" />
+          <div className="h-8 w-24 bg-[#141416] border border-[#222226] animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <ProviderCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+
+      {/* API Key Providers */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="h-5 w-40 bg-[#1c1c24] animate-pulse" />
+          <div className="h-8 w-48 bg-[#141416] border border-[#222226] animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          {[...Array(8)].map((_, i) => (
+            <ProviderCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

@@ -2,8 +2,9 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { RequestLogger, CardSkeleton } from "@/shared/components";
+import { RequestLogger } from "@/shared/components";
 import UsageStats from "@/shared/components/UsageStats";
+import UsageStatsSkeleton from "./components/UsageStatsSkeleton";
 import RequestDetailsTab from "./components/RequestDetailsTab";
 
 const PERIODS = [
@@ -17,7 +18,7 @@ const PERIODS = [
 
 export default function UsagePage() {
   return (
-    <Suspense fallback={<CardSkeleton />}>
+    <Suspense fallback={<UsageStatsSkeleton />}>
       <UsageContent />
     </Suspense>
   );
@@ -95,7 +96,7 @@ function UsageContent() {
       </div>
 
       {activeTab === "overview" && (
-        <Suspense fallback={<CardSkeleton />}>
+        <Suspense fallback={<UsageStatsSkeleton />}>
           <UsageStats period={period} setPeriod={setPeriod} hidePeriodSelector />
         </Suspense>
       )}

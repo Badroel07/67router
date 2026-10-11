@@ -39,7 +39,7 @@ export function Skeleton({ className, ...props }) {
   return (
     <div
       className={cn(
-        "animate-pulse rounded-[10px] bg-surface-2",
+        "animate-pulse bg-[#1c1c24]",
         className
       )}
       {...props}
@@ -48,15 +48,15 @@ export function Skeleton({ className, ...props }) {
 }
 
 // Card skeleton
-export function CardSkeleton() {
+export function CardSkeleton({ className }) {
   return (
-    <div className="p-6 rounded-[14px] border border-border-subtle bg-surface shadow-[var(--shadow-soft)]">
+    <div className={cn("p-5 border border-[#23242a] bg-[#121216] shadow-sm", className)}>
       <div className="flex items-center justify-between mb-4">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="size-10 rounded-[10px]" />
+        <Skeleton className="h-3.5 w-28" />
+        <Skeleton className="size-8" />
       </div>
-      <Skeleton className="h-8 w-16 mb-2" />
-      <Skeleton className="h-3 w-20" />
+      <Skeleton className="h-7 w-20 mb-2" />
+      <Skeleton className="h-3 w-36" />
     </div>
   );
 }

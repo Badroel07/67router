@@ -4,6 +4,25 @@ Bagian dari sistem changelog terpecah per batas ukuran. Indeks lengkap: [`CHANGE
 
 ## Riwayat Perubahan
 
+### [2026-10-11] - Redesain Total Semua Skeleton Loading Menyerupai Layout Asli (v1.0.13)
+- **Kategori**: UI/UX | Layout | Polish
+- **File & Baris Terkait**:
+  - `src/shared/components/Loading.js:38-62` (mengganti styling Skeleton bawaan putih/rounded-10px menjadi obsidian `#1c1c24` border `#23242a` bg `#121216`)
+  - `src/app/(dashboard)/dashboard/usage/components/UsageStatsSkeleton.js` (komponen baru yang mereplikasi secara 1:1 layout Usage page: OverviewCards 5 kolom, ModelFlowRouting 3 kolom + RecentRequests 2 kolom tinggi 460px, Analytics + ProviderBarChart, dan UsageTable)
+  - `src/shared/components/UsageStats.js:475-570` (mengganti spinner teks generic dengan skeleton loading proporsional)
+  - `src/app/(dashboard)/dashboard/usage/page.js:20,98` (menggunakan `UsageStatsSkeleton` sebagai Suspense fallback)
+  - `src/app/(dashboard)/dashboard/endpoint/EndpointPageClient.js:9-70` (mengganti "Loading..." teks biasa dengan `EndpointPageSkeleton` yang mereplikasi card Endpoint, API Key, dan Code Example)
+  - `src/app/(dashboard)/dashboard/providers/page.js:370-435` (mengganti CardSkeleton generic dengan `ProvidersPageSkeleton` yang mereplikasi grid kartu provider OAuth, Free, dan API Key)
+  - `src/app/(dashboard)/dashboard/combos/page.js:350-400` (mengganti CardSkeleton generic dengan `CombosPageSkeleton` yang mereplikasi header info dan daftar kartu combo)
+  - `src/app/(dashboard)/dashboard/cli-tools/CLIToolsPageClient.js:10-50` (mengganti CardSkeleton generic dengan `CLIToolsPageSkeleton` yang mereplikasi grid CLI Tools dan MITM Tools)
+  - `src/app/(dashboard)/dashboard/proxy-pools/page.js:600-645` (mengganti CardSkeleton generic dengan `ProxyPoolsPageSkeleton` yang mereplikasi header deploy relay dan tabel pool)
+  - `src/app/(dashboard)/dashboard/providers/[id]/page.js:39-75` (mengganti CardSkeleton generic dengan `ProviderDetailPageSkeleton` yang mereplikasi icon, header, dan detail provider)
+  - `package.json:3`, `cli/package.json:3`, `cli/app/package.json:3` (kenaikan versi patch ke v1.0.13)
+- **Deskripsi Perubahan**:
+  - Merekayasa ulang seluruh transisi loading pada semua halaman dashboard agar skeleton loading mencerminkan wireframe dan layout kartu aslinya secara presisi (mencegah layout shift dan glitch visual).
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Seluruh skeleton loading dimodifikasi, divalidasi, dan di-build.
+
 ### [2026-10-11] - Upgrade Desain Tombol Aksi API Key & Hapus Header Icons (v1.0.12)
 - **Kategori**: UI/UX | Styling | Clean Up
 - **File & Baris Terkait**:

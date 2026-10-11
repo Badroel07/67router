@@ -6,6 +6,95 @@ import { Modal, ConfirmModal, Toggle } from "@/shared/components";
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
 import useSettingsStore from "@/store/settingsStore";
 import KeyAccessControls from "./components/KeyAccessControls";
+function EndpointPageSkeleton() {
+  return (
+    <div className="flex flex-col gap-6 max-w-5xl mx-auto pb-12 select-none">
+      {/* 1. ENDPOINT SECTION SKELETON */}
+      <div className="border border-[#222226] bg-[#0F0F10]">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#222226]">
+          <div className="h-3.5 w-20 bg-[#1c1c24] animate-pulse" />
+          <div className="h-3 w-16 bg-[#181820] animate-pulse" />
+        </div>
+
+        <div className="divide-y divide-[#222226]">
+          {/* Local Loopback */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="h-3 w-16 bg-[#1c1c24] animate-pulse sm:w-[120px]" />
+            <div className="flex-1 flex items-center gap-2 min-w-0">
+              <div className="flex-1 h-8 bg-[#080808] border border-[#222226] animate-pulse" />
+              <div className="h-8 w-16 bg-[#141416] border border-[#2E2E33] animate-pulse" />
+            </div>
+          </div>
+
+          {/* Cloudflare Tunnel */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="h-3 w-24 bg-[#1c1c24] animate-pulse sm:w-[120px]" />
+            <div className="flex-1 flex items-center gap-2 min-w-0">
+              <div className="flex-1 h-8 bg-[#080808] border border-[#222226] animate-pulse" />
+              <div className="h-8 w-16 bg-[#141416] border border-[#2E2E33] animate-pulse" />
+            </div>
+          </div>
+
+          {/* Tailscale */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="h-3 w-20 bg-[#1c1c24] animate-pulse sm:w-[120px]" />
+            <div className="flex-1 flex items-center gap-2 min-w-0">
+              <div className="flex-1 h-8 bg-[#080808] border border-[#222226] animate-pulse" />
+              <div className="h-8 w-16 bg-[#141416] border border-[#2E2E33] animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. API KEYS SECTION SKELETON */}
+      <div className="border border-[#222226] bg-[#0F0F10]">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#222226]">
+          <div className="h-3.5 w-32 bg-[#1c1c24] animate-pulse" />
+          <div className="h-7 w-24 bg-[#1c1c24] animate-pulse" />
+        </div>
+
+        <div className="divide-y divide-[#222226]">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="h-3.5 w-24 bg-[#1c1c24] animate-pulse sm:min-w-[120px]" />
+                <div className="h-6 w-48 bg-[#080808] border border-[#222226] animate-pulse" />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="h-6 w-14 bg-[#141416] border border-[#23242A] animate-pulse" />
+                <div className="h-6 w-14 bg-[#141416] border border-[#23242A] animate-pulse" />
+                <div className="h-6 w-14 bg-[#141416] border border-[#23242A] animate-pulse" />
+                <div className="h-6 w-6 bg-[#141416] border border-[#23242A] animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. QUICK CODE EXAMPLE SKELETON */}
+      <div className="border border-[#222226] bg-[#0F0F10]">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#222226]">
+          <div className="h-3.5 w-32 bg-[#1c1c24] animate-pulse" />
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-10 bg-[#1c1c24] animate-pulse" />
+            <div className="h-4 w-12 bg-[#181820] animate-pulse" />
+            <div className="h-4 w-10 bg-[#181820] animate-pulse" />
+          </div>
+        </div>
+
+        <div className="p-4 bg-[#080808] space-y-2">
+          <div className="h-3 w-3/4 bg-[#1c1c24] animate-pulse" />
+          <div className="h-3 w-1/2 bg-[#181820] animate-pulse" />
+          <div className="h-3 w-2/3 bg-[#181820] animate-pulse" />
+          <div className="h-3 w-1/3 bg-[#181820] animate-pulse" />
+          <div className="h-3 w-3/5 bg-[#181820] animate-pulse" />
+          <div className="h-3 w-2/5 bg-[#181820] animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function APIPageClient({ machineId }) {
   const [keys, setKeys] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -236,12 +325,7 @@ console.log(res.choices[0].message.content);`;
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center gap-2 font-mono text-xs text-[#A1A1A6] py-12">
-        <span className="w-1.5 h-1.5 bg-[#C5A880]" />
-        <span>Loading...</span>
-      </div>
-    );
+    return <EndpointPageSkeleton />;
   }
 
   return (

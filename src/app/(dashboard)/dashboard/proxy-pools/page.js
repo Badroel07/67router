@@ -27,6 +27,38 @@ function normalizeFormData(data = {}) {
   };
 }
 
+function ProxyPoolsPageSkeleton() {
+  return (
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-1 sm:gap-6 sm:px-0">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="h-7 w-36 bg-[#1c1c24] animate-pulse" />
+        <div className="h-8 w-32 bg-[#141416] border border-[#222226] animate-pulse" />
+      </div>
+
+      <div className="border border-[#222226] bg-[#0F0F10] p-4 flex flex-col gap-4">
+        <div className="flex items-center justify-between border-b border-[#222226] pb-3">
+          <div className="h-4 w-40 bg-[#1c1c24] animate-pulse" />
+          <div className="h-5 w-16 bg-[#181820] animate-pulse" />
+        </div>
+        <div className="divide-y divide-[#222226]">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1.5 flex-1">
+                <div className="h-4 w-32 bg-[#1c1c24] animate-pulse" />
+                <div className="h-3 w-56 bg-[#181820] animate-pulse" />
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="h-6 w-14 bg-[#141416] border border-[#222226] animate-pulse" />
+                <div className="h-6 w-14 bg-[#141416] border border-[#222226] animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProxyPoolsPage() {
   const [proxyPools, setProxyPools] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -601,12 +633,7 @@ export default function ProxyPoolsPage() {
   );
 
   if (loading) {
-    return (
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-1 sm:gap-6 sm:px-0">
-        <CardSkeleton />
-        <CardSkeleton />
-      </div>
-    );
+    return <ProxyPoolsPageSkeleton />;
   }
 
   return (

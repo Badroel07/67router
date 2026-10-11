@@ -36,6 +36,37 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function ProviderDetailPageSkeleton() {
+  return (
+    <div className="flex min-w-0 flex-col gap-6 px-1 sm:gap-8 sm:px-0">
+      {/* Header Skeleton */}
+      <div className="min-w-0 space-y-4">
+        <div className="h-4 w-32 bg-[#1c1c24] animate-pulse" />
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="size-12 bg-[#1c1c24] animate-pulse shrink-0" />
+          <div className="space-y-1.5 flex-1">
+            <div className="h-7 w-48 bg-[#1c1c24] animate-pulse" />
+            <div className="h-3.5 w-32 bg-[#181820] animate-pulse" />
+          </div>
+        </div>
+      </div>
+
+      {/* Cards Skeleton */}
+      <div className="space-y-6">
+        <div className="bg-[#0F0F10] border border-[#222226] p-6 space-y-4">
+          <div className="h-5 w-40 bg-[#1c1c24] animate-pulse" />
+          <div className="h-10 w-full bg-[#141416] border border-[#222226] animate-pulse" />
+          <div className="h-10 w-full bg-[#141416] border border-[#222226] animate-pulse" />
+        </div>
+        <div className="bg-[#0F0F10] border border-[#222226] p-6 space-y-4">
+          <div className="h-5 w-36 bg-[#1c1c24] animate-pulse" />
+          <div className="h-8 w-44 bg-[#141416] border border-[#222226] animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProviderDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -1334,13 +1365,8 @@ export default function ProviderDetailPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col gap-8">
-        <CardSkeleton />
-        <CardSkeleton />
-      </div>
-    );
-}
+    return <ProviderDetailPageSkeleton />;
+  }
 
   if (!providerInfo) {
     return (

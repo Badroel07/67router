@@ -14,6 +14,12 @@ import Badge from "./Badge";
 import Card from "./Card";
 import OverviewCards from "@/app/(dashboard)/dashboard/usage/components/OverviewCards";
 import UsageTable, { fmt, fmtTime } from "@/app/(dashboard)/dashboard/usage/components/UsageTable";
+import {
+  OverviewCardsSkeleton,
+  RoutingAndRecentSkeleton,
+  AnalyticsAndShareSkeleton,
+  UsageTableSkeleton,
+} from "@/app/(dashboard)/dashboard/usage/components/UsageStatsSkeleton";
 import dynamic from "next/dynamic";
 // Lazy-load: keeps @xyflow/react and recharts out of the initial bundle
 const ModelFlowRouting = dynamic(() => import("@/app/(dashboard)/dashboard/usage/components/ModelFlowRouting"), { ssr: false });
@@ -474,10 +480,10 @@ export default function UsageStats({ period: periodProp, setPeriod: setPeriodPro
       )}
 
       {/* Overview cards */}
-      {loading ? spinner : <OverviewCards stats={stats} />}
+      {loading ? <OverviewCardsSkeleton /> : <OverviewCards stats={stats} />}
 
       {/* Real-time Model Flow Routing & Recent Gateway Requests */}
-      {loading ? spinner : (
+      {loading ? <RoutingAndRecentSkeleton /> : (
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch lg:h-[460px]">
           {/* Real-time Model Flow Routing (3 cols - aligns with cards 1, 2, 3) */}
           <div className="lg:col-span-3 h-full">
@@ -505,7 +511,7 @@ export default function UsageStats({ period: periodProp, setPeriod: setPeriodPro
       )}
 
       {/* Analytics & Provider Share */}
-      {loading ? spinner : (
+      {loading ? <AnalyticsAndShareSkeleton /> : (
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch">
           <div className="lg:col-span-3 h-full">
             <UsageChart period={period} stats={stats} />
@@ -564,7 +570,7 @@ export default function UsageStats({ period: periodProp, setPeriod: setPeriodPro
           </div>
         </div>
 
-        {loading ? spinner : activeTableConfig && (
+        {loading ? <UsageTableSkeleton /> : activeTableConfig && (
           <UsageTable
             columns={activeTableConfig.columns}
             groupedData={activeTableConfig.groupedData}

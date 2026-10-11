@@ -352,12 +352,7 @@ export default function CombosPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col gap-6">
-        <CardSkeleton />
-        <CardSkeleton />
-      </div>
-    );
+    return <CombosPageSkeleton />;
   }
 
   return (
@@ -562,6 +557,46 @@ const fmtK = (n) => {
   }
   return `${Math.round(n / 1000)}k`;
 };
+
+function CombosPageSkeleton() {
+  return (
+    <div className="flex min-w-0 flex-col gap-6 px-1 sm:px-0">
+      {/* Header Skeleton */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 space-y-2">
+          <div className="h-4 w-72 bg-[#1c1c24] animate-pulse" />
+          <div className="h-3.5 w-96 bg-[#181820] animate-pulse" />
+          <div className="h-3.5 w-80 bg-[#181820] animate-pulse" />
+        </div>
+        <div className="h-9 w-32 bg-[#141416] border border-[#222226] animate-pulse shrink-0" />
+      </div>
+
+      {/* Combos List Skeleton */}
+      <div className="flex flex-col gap-3">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-[#0F0F10] border border-[#222226] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-4 h-4 bg-[#181820] animate-pulse" />
+              <div className="size-8 bg-[#1c1c24] animate-pulse shrink-0" />
+              <div className="space-y-1.5 min-w-0 flex-1">
+                <div className="h-4 w-36 bg-[#1c1c24] animate-pulse" />
+                <div className="flex items-center gap-2">
+                  <div className="h-3.5 w-24 bg-[#181820] animate-pulse" />
+                  <div className="h-3.5 w-20 bg-[#181820] animate-pulse" />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="h-7 w-28 bg-[#141416] border border-[#222226] animate-pulse" />
+              <div className="h-7 w-12 bg-[#141416] border border-[#222226] animate-pulse" />
+              <div className="h-7 w-7 bg-[#141416] border border-[#222226] animate-pulse" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function ComboCard({ combo, getCaps, comboByName = {}, activeProviders = [], copied, onCopy, onEdit, onDelete, strategy = {}, onSetStrategy, selected = false, onToggleSelect }) {
   const [showJudgeSelect, setShowJudgeSelect] = useState(false);
