@@ -50,7 +50,7 @@ function RecentRequests({ requests = [] }) {
   }
 
   return (
-    <div className="space-y-2.5 overflow-y-auto max-h-[380px] pr-1">
+    <div className="space-y-2.5 overflow-y-auto h-full pr-1">
       {requests.map((r, i) => {
         const ok = !r.status || r.status === "ok" || r.status === "success" || r.status === 200;
         const reqShortId = r.id ? String(r.id).slice(-5) : `${i + 1}a`;
@@ -485,20 +485,19 @@ export default function UsageStats({ period: periodProp, setPeriod: setPeriodPro
               providers={providers}
               activeRequests={stats.activeRequests || []}
               recentRequests={stats.recentRequests || []}
-              byProvider={stats.byProvider || {}}
               stats={stats}
             />
           </div>
 
           {/* Recent Gateway Requests (2 cols - aligns with cards 4, 5: Output Tokens & Est Cost) */}
-          <div className="lg:col-span-2 bg-[#121216] border border-[#23242a] p-6 flex flex-col justify-between shadow-sm h-full">
+          <div className="lg:col-span-2 bg-[#121216] border border-[#23242a] p-6 flex flex-col shadow-sm h-full">
             <div className="flex items-center justify-between border-b border-[#23242a] pb-4 mb-4 shrink-0">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-lg text-[#3b82f6]">schedule</span>
                 <h2 className="text-sm font-semibold text-[#ededef]">Recent Gateway Requests</h2>
               </div>
             </div>
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-hidden">
               <RecentRequests requests={stats.recentRequests || []} />
             </div>
           </div>

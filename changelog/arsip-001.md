@@ -4,6 +4,20 @@ Bagian dari sistem changelog terpecah per batas ukuran. Indeks lengkap: [`CHANGE
 
 ## Riwayat Perubahan
 
+### [2026-10-11] - Hapus Flow View, Perbaiki Warna Tombol Zoom ReactFlow & Full-Height Recent Requests (v1.0.8)
+- **Kategori**: UI/UX | Refactor | Cleanup
+- **File & Baris Terkait**:
+  - `src/app/(dashboard)/dashboard/usage/components/ModelFlowRouting.js:1-65` (menyederhanakan komponen — menghapus seluruh pipeline view, state `viewMode`, toggle button, dan logika provider flow; sekarang hanya render graph ProviderTopology langsung)
+  - `src/app/globals.css:168-215` (menambahkan override CSS `.react-flow__controls-button` agar tombol zoom-in/zoom-out/fit-view menggunakan background gelap obsidian `#1a1a20`, border `#2b2c36`, icon berwarna `#9c9ca4`, dengan hover state menampilkan aksen perunggu `#c5a880`)
+  - `src/shared/components/UsageStats.js:53,484-490` (mengubah `max-h-[380px]` menjadi `h-full` pada list Recent Gateway Requests agar scroll area mengisi ruang vertikal penuh; menyesuaikan prop `ModelFlowRouting` dengan menghapus `byProvider`)
+  - `package.json:3`, `cli/package.json:3`, `cli/app/package.json:3` (kenaikan versi patch ke v1.0.8)
+- **Deskripsi Perubahan**:
+  - Menghapus fitur Flow View (pipeline cards animasi) sepenuhnya. Tampilan routing sekarang selalu menggunakan Graph (ReactFlow ProviderTopology).
+  - Memperbaiki tombol kontrol ReactFlow (Zoom In, Zoom Out, Fit View) yang sebelumnya berwarna putih mencolok menjadi sesuai tema gelap obsidian dashboard.
+  - Memperbaiki Recent Gateway Requests agar scroll area memenuhi seluruh tinggi kartu tanpa ruang kosong yang tersisa di bawah.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Seluruh perubahan terverifikasi dan build Next.js sukses.
+
 ### [2026-10-11] - Perbaikan Responsivitas UI Usage & Bump Versi ke v1.0.7
 - **Kategori**: UI/UX | Refactor | Alignment
 - **File & Baris Terkait**:
