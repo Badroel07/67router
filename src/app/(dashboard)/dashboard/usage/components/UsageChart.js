@@ -11,7 +11,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import Card from "@/shared/components/Card";
 
 const fmtTokens = (n) => {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
@@ -19,22 +18,22 @@ const fmtTokens = (n) => {
   return String(n || 0);
 };
 
-const fmtCost = (n) => `$${(n || 0).toFixed(4)}`;
+const fmtCost = (n) => `$${(n || 0).toFixed(2)}`;
 const fmtRequests = (n) => String(n || 0);
 
 const VIEW_MODES = [
   { value: "tokens", label: "Tokens" },
   { value: "requests", label: "Requests" },
-  { value: "cost", label: "Cost" },
+  { value: "cost", label: "Cost ($)" },
 ];
 
 const VIEW_CONFIG = {
-  tokens:   { dataKey: "tokens",   color: "#6366f1", gradId: "gradTokens",   formatter: fmtTokens,   label: "Tokens" },
-  requests: { dataKey: "requests", color: "#14b8a6", gradId: "gradRequests", formatter: fmtRequests, label: "Requests" },
-  cost:     { dataKey: "cost",     color: "#f59e0b", gradId: "gradCost",     formatter: fmtCost,     label: "Cost" },
+  tokens:   { dataKey: "tokens",   color: "#c5a880", gradId: "goldGrad",   formatter: fmtTokens,   label: "Tokens" },
+  requests: { dataKey: "requests", color: "#10b981", gradId: "greenGrad",  formatter: fmtRequests, label: "Requests" },
+  cost:     { dataKey: "cost",     color: "#fbbf24", gradId: "amberGrad",  formatter: fmtCost,     label: "Cost" },
 };
 
-export default function UsageChart({ period = "7d" }) {
+export default function UsageChart({ period = "7d", stats = null }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState("tokens");
@@ -62,83 +61,111 @@ export default function UsageChart({ period = "7d" }) {
   const hasData = data.some((d) => (d[cfg.dataKey] || 0) > 0);
 
   return (
-    <Card className="flex min-w-0 flex-col gap-3 p-3 sm:p-4">
-      <div
-        className="grid w-full items-center gap-1 rounded-lg border border-border bg-bg-subtle p-1 sm:w-auto sm:self-start"
-        style={{ gridTemplateColumns: `repeat(${VIEW_MODES.length}, minmax(0, 1fr))` }}
-      >
-        {VIEW_MODES.map((m) => (
-          <button
-            key={m.value}
-            onClick={() => setViewMode(m.value)}
-            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${viewMode === m.value ? "bg-primary text-white shadow-sm" : "text-text-muted hover:text-text hover:bg-bg-hover"}`}
-          >
-            {m.label}
-          </button>
-        ))}
+    <div className="bg-[#121216] border border-[#23242a] p-6 flex flex-col shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#23242a] pb-4 mb-4">
+        <div>
+          <h2 className="text-sm font-semibold text-[#ededef]">Tokens Over Time</h2>
+          <p className="text-[11px] text-[#9c9ca4]">Hourly token consumption breakdown &amp; cache efficiency</p>
+        </div>
+        <div className="inline-flex items-center p-0.5 bg-[#181820] border border-[#23242a]">
+          {VIEW_MODES.map((m) => {
+            const isActive = viewMode === m.value;
+            return (
+              <button
+                key={m.value}
+                onClick={() => setViewMode(m.value)}
+                className={`px-3 py-1 text-xs font-medium transition-colors ${
+                  isActive
+                    ? "bg-[#242430] text-[#c5a880]"
+                    : "text-[#9c9ca4] hover:text-[#ededef]"
+                }`}
+              >
+                {m.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {loading ? (
-        <div className="h-48 flex items-center justify-center text-text-muted text-sm">Loading...</div>
-      ) : !hasData ? (
-        <div className="h-48 flex items-center justify-center text-text-muted text-sm">No data for this period</div>
-      ) : (
-        <ResponsiveContainer width="100%" height={220}>
-          <AreaChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="gradTokens" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="gradRequests" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="gradCost" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} />
-            <XAxis
-              dataKey="label"
-              tick={{ fontSize: 10, fill: "currentColor", fillOpacity: 0.5 }}
-              tickLine={false}
-              axisLine={false}
-              interval="preserveStartEnd"
-            />
-            <YAxis
-              tick={{ fontSize: 10, fill: "currentColor", fillOpacity: 0.5 }}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={cfg.formatter}
-              width={50}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--color-bg)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "8px",
-                fontSize: "12px",
-              }}
-              formatter={(value) => [cfg.formatter(value), cfg.label]}
-            />
-            <Area
-              type="monotone"
-              dataKey={cfg.dataKey}
-              stroke={cfg.color}
-              strokeWidth={2}
-              fill={`url(#${cfg.gradId})`}
-              dot={false}
-              activeDot={{ r: 4 }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      )}
-    </Card>
+      <div className="relative h-60 w-full mt-2">
+        {loading ? (
+          <div className="h-full flex items-center justify-center text-[#9c9ca4] text-xs">Loading chart telemetry...</div>
+        ) : !hasData ? (
+          <div className="h-full flex items-center justify-center text-[#9c9ca4] text-xs">No activity recorded for this period</div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#c5a880" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#c5a880" stopOpacity={0.0} />
+                </linearGradient>
+                <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.0} />
+                </linearGradient>
+                <linearGradient id="amberGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#fbbf24" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#fbbf24" stopOpacity={0.0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1f2026" vertical={false} />
+              <XAxis
+                dataKey="label"
+                tick={{ fontSize: 10, fill: "#9c9ca4" }}
+                tickLine={false}
+                axisLine={{ stroke: "#23242a" }}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: "#9c9ca4" }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={cfg.formatter}
+                width={50}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#16161c",
+                  border: "1px solid #2b2c36",
+                  color: "#ededef",
+                  fontSize: "12px",
+                  borderRadius: "0px",
+                  padding: "8px 12px",
+                }}
+                formatter={(val) => [cfg.formatter(val), cfg.label]}
+              />
+              <Area
+                type="monotone"
+                dataKey={cfg.dataKey}
+                stroke={cfg.color}
+                strokeWidth={2}
+                fill={`url(#${cfg.gradId})`}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-end gap-6 pt-3 mt-2 border-t border-[#23242a] text-xs">
+        <div className="flex items-center gap-2">
+          <span className="w-3.5 h-1 bg-[#c5a880] inline-block" />
+          <span className="text-[#ededef]">Total Ingested {stats?.totalPromptTokens ? `(${fmtTokens(stats.totalPromptTokens)})` : ""}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3.5 h-1 bg-[#3b82f6] inline-block" />
+          <span className="text-[#9c9ca4]">Prompt Cache {stats?.totalCachedTokens ? `(${fmtTokens(stats.totalCachedTokens)})` : ""}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3.5 h-1 bg-[#10b981] inline-block" />
+          <span className="text-[#9c9ca4]">Output {stats?.totalCompletionTokens ? `(${fmtTokens(stats.totalCompletionTokens)})` : ""}</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
 UsageChart.propTypes = {
   period: PropTypes.string,
+  stats: PropTypes.object,
 };

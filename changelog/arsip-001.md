@@ -4,6 +4,52 @@ Bagian dari sistem changelog terpecah per batas ukuran. Indeks lengkap: [`CHANGE
 
 ## Riwayat Perubahan
 
+### [2026-10-11] - Perbaikan Responsivitas UI Usage & Bump Versi ke v1.0.7
+- **Kategori**: UI/UX | Refactor | Alignment
+- **File & Baris Terkait**:
+  - `src/app/(dashboard)/dashboard/usage/page.js:46-95` (menghapus blok heading `AI Gateway & Router Intelligence` yang berlebih dan mempertahankan toolbar tabs Overview/Details serta period selector yang bersih di bagian atas)
+  - `src/shared/components/UsageStats.js:480-530` (penyelarasan grid 5-kolom `lg:grid-cols-5 gap-4` sehingga `Recent Gateway Requests` sejajar lurus dengan Output Tokens & Est Cost, serta menghapus badge `Real-time stream` di header Recent Requests)
+  - `src/app/(dashboard)/dashboard/usage/components/ProviderBarChart.js:65-115` (menambahkan `h-full flex flex-col justify-between` agar kartu By Provider mengisi ruang vertikal penuh ke bawah dan menyatu rata dengan UsageChart)
+  - `src/app/(dashboard)/dashboard/usage/components/ModelFlowRouting.js:100` (menyelaraskan tinggi kartu model flow routing dengan `h-full flex flex-col justify-between`)
+  - `package.json:3`, `cli/package.json:3`, `cli/app/package.json:3` (kenaikan versi patch ke v1.0.7)
+- **Deskripsi Perubahan**:
+  - Menghapus header duplikat judul dan deskripsi di halaman usage agar ruang vertikal lebih lega.
+  - Memperbaiki ketidaksejajaran horizontal antara kartu metrik baris atas dan baris tengah dengan grid 5-kolom 3:2 yang konsisten.
+  - Menghapus label "Real-time stream" pada Recent Gateway Requests.
+  - Memperbaiki kartu "By Provider" agar tingginya penuh ke bawah tanpa menyisakan ruang kosong canggung di bawah widget Auto-Routing Savings.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Seluruh layout halaman usage terverifikasi rapi dan build Next.js sukses.
+
+### [2026-10-11] - Pembersihan Header Usage & Penyelarasan Grid Recent Requests dengan Output Tokens & Est Cost
+- **Kategori**: UI/UX | Refactor | Alignment
+- **File & Baris Terkait**:
+  - `src/app/(dashboard)/dashboard/usage/page.js:46-95` (menghapus blok heading `AI Gateway & Router Intelligence` yang berlebih dan mempertahankan toolbar tabs Overview/Details serta period selector yang bersih di bagian atas)
+  - `src/shared/components/UsageStats.js:480-530` (mengonversi layout baris menjadi grid 5-kolom `lg:grid-cols-5 gap-4`, sehingga `Recent Gateway Requests` yang menempati `lg:col-span-2` sejajar secara vertikal dengan 2 kartu metrik di atasnya yaitu Output Tokens dan Est. Cost; serta Model Flow Routing menempati `lg:col-span-3` sejajar dengan 3 kartu metrik kiri)
+  - `src/app/(dashboard)/dashboard/usage/components/ModelFlowRouting.js:100` (menyelaraskan tinggi kartu model flow routing dengan `h-full flex flex-col justify-between`)
+- **Deskripsi Perubahan**:
+  - Menghapus header duplikat judul dan deskripsi di halaman usage agar ruang vertikal lebih lega.
+  - Memperbaiki ketidaksejajaran horizontal antara kartu metrik baris atas dan baris tengah. Menggunakan grid 5-kolom terpadu (3-kolom kiri, 2-kolom kanan) sehingga pembatas vertikal antara `Cached Tokens` & `Output Tokens` di baris atas sejajar lurus dengan pembatas antara `Model Flow Routing` & `Recent Gateway Requests` di baris bawah.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Header dibersihkan dan grid sejajar sempurna telah berhasil diuji dan dibangun melalui Next.js.
+
+### [2026-10-11] - Redesain UI Halaman Usage Mengikuti Desain Stitch AI Gateway & Router Intelligence
+- **Kategori**: UI/UX | Redesign | Feature
+- **File & Baris Terkait**:
+  - `src/app/(dashboard)/dashboard/usage/components/ModelFlowRouting.js:1-240` (komponen visualisasi alur routing pipelined identik dengan desain Stitch: kartu Client Apps, kartu tengah 67Router Hub scale-105 beraksen `#c5a880`, kartu tumpukan provider Target berindikator Active/Standby/Backup, kurva SVG animasi animated dash stroke, dan switcher mode Flow vs Graph)
+  - `src/app/(dashboard)/dashboard/usage/page.js:1-118` (mengimplementasikan Stitch luxury header terpadu dengan ikon hub `#c5a880`, judul AI Gateway & Router Intelligence, serta kontrol tersegmentasi untuk tab Overview/Details dan tombol periode)
+  - `src/app/(dashboard)/dashboard/usage/components/OverviewCards.js:1-125` (merombak 5 kartu metrik utama dengan ambient blur glow, ikon material semantik, font tabular, dan pill hit rate serta estimasi penghematan cache)
+  - `src/app/(dashboard)/dashboard/usage/components/ProviderTopology.js:33-145,355-445` (menyelaraskan node router dan provider dengan bingkai gelap mewah obsidian `#121216` dan aksen perunggu `#c5a880`)
+  - `src/shared/components/UsageStats.js:44-95,475-585` (mengintegrasikan layout grid 12-kolom: kanvas Real-time Model Flow Routing dengan metrik footer Fallback Rate/P95 Latency/Routing Health di kiri 7-kolom, stream Recent Gateway Requests berbasis kartu Stitch di kanan 5-kolom, grafik Tokens Over Time 8-kolom, serta By Provider share bars & Auto-Routing Savings 4-kolom)
+  - `src/app/(dashboard)/dashboard/usage/components/UsageChart.js:1-175` (merombak grafik Tokens Over Time dengan kurva area gradient emas `#c5a880`, teal `#10b981`, dan amber `#fbbf24`, tooltip luxury, serta footer breakdown data)
+  - `src/app/(dashboard)/dashboard/usage/components/ProviderBarChart.js:1-120` (memperbarui tampilan By Provider dengan progress bar gradien, persentase pangsa, dan kartu widget Auto-Routing Savings)
+  - `src/app/(dashboard)/dashboard/usage/components/UsageTable.js:34-75,120-275` (merancang ulang tabel perincian penggunaan dengan tema gelap Stitch `#121216`, highlight warna token/biaya, dan baris total ringkasan tfoot)
+- **Deskripsi Perubahan**:
+  - Menyelaraskan antarmuka pengguna (UI) halaman `/dashboard/usage` dengan desain dari Stitch project `1028032493152875703` (screen: `aa3c67fc146043969a6f2d48453fcd41` - "9Router AI Observability Dashboard (Refined Minimalist)").
+  - Menyediakan visualisasi pipelined card 3-tier persis Stitch (Client Apps → 67Router Hub → Target Providers) lengkap dengan animasi path kurva aliran data dinamis.
+  - Tetap mempertahankan tipografi asli (`Momo Trust Sans`) sesuai instruksi.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Seluruh layout dan komponen halaman usage telah berhasil direfaktor dan divalidasi dengan build Next.js.
+
 ### [2026-10-11] - Pembaruan Dokumentasi Paket npm CLI (cli/README.md)
 - **Kategori**: Documentation | Changed
 - **File & Baris Terkait**:

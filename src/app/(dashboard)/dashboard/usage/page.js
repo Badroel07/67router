@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { RequestLogger, CardSkeleton, SegmentedControl } from "@/shared/components";
+import { RequestLogger, CardSkeleton } from "@/shared/components";
 import UsageStats from "@/shared/components/UsageStats";
 import RequestDetailsTab from "./components/RequestDetailsTab";
 
@@ -43,25 +43,54 @@ function UsageContent() {
 
   return (
     <div className="flex min-w-0 flex-col gap-6 px-1 sm:px-0">
-      {/* Tabs + period selector on same row */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <SegmentedControl
-          options={[
-            { value: "overview", label: "Overview" },
-            { value: "details", label: "Details" },
-          ]}
-          value={activeTab}
-          onChange={handleTabChange}
-          className="w-full sm:w-auto"
-        />
+      {/* Controls: Tabs + Period Selector */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[#23242a] pb-4">
+        {/* Tabs: Overview vs Details */}
+        <div className="inline-flex items-center p-1 bg-[#141418] border border-[#23242a]">
+          <button
+            onClick={() => handleTabChange("overview")}
+            className={`px-4 py-1.5 font-medium text-xs transition-all flex items-center gap-1.5 ${
+              activeTab === "overview"
+                ? "bg-[#1f1f26] text-[#ededef] shadow-sm"
+                : "text-[#9c9ca4] hover:text-[#ededef]"
+            }`}
+          >
+            <span className={`material-symbols-outlined text-sm ${activeTab === "overview" ? "text-[#c5a880]" : ""}`}>dashboard</span>
+            Overview
+          </button>
+          <button
+            onClick={() => handleTabChange("details")}
+            className={`px-4 py-1.5 font-medium text-xs transition-all flex items-center gap-1.5 ${
+              activeTab === "details"
+                ? "bg-[#1f1f26] text-[#ededef] shadow-sm"
+                : "text-[#9c9ca4] hover:text-[#ededef]"
+            }`}
+          >
+            <span className={`material-symbols-outlined text-sm ${activeTab === "details" ? "text-[#c5a880]" : ""}`}>data_thresholding</span>
+            Details
+          </button>
+        </div>
+
+        {/* Period Selector */}
         {activeTab === "overview" && (
-          <SegmentedControl
-            options={PERIODS}
-            value={period}
-            onChange={setPeriod}
-            size="sm"
-            className="w-full sm:w-auto"
-          />
+          <div className="inline-flex items-center p-1 bg-[#141418] border border-[#23242a]">
+            {PERIODS.map((p) => {
+              const isActive = period === p.value;
+              return (
+                <button
+                  key={p.value}
+                  onClick={() => setPeriod(p.value)}
+                  className={`px-3 py-1 text-xs transition-all ${
+                    isActive
+                      ? "font-semibold bg-[#c5a880] text-[#0e0e11] shadow-sm"
+                      : "font-medium text-[#9c9ca4] hover:text-[#ededef]"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
         )}
       </div>
 

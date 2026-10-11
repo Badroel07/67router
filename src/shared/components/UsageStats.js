@@ -16,10 +16,9 @@ import OverviewCards from "@/app/(dashboard)/dashboard/usage/components/Overview
 import UsageTable, { fmt, fmtTime } from "@/app/(dashboard)/dashboard/usage/components/UsageTable";
 import dynamic from "next/dynamic";
 // Lazy-load: keeps @xyflow/react and recharts out of the initial bundle
-const ProviderTopology = dynamic(() => import("@/app/(dashboard)/dashboard/usage/components/ProviderTopology"), { ssr: false });
+const ModelFlowRouting = dynamic(() => import("@/app/(dashboard)/dashboard/usage/components/ModelFlowRouting"), { ssr: false });
 const UsageChart = dynamic(() => import("@/app/(dashboard)/dashboard/usage/components/UsageChart"), { ssr: false });
 const ProviderBarChart = dynamic(() => import("@/app/(dashboard)/dashboard/usage/components/ProviderBarChart"), { ssr: false });
-const TopModelsChart = dynamic(() => import("@/app/(dashboard)/dashboard/usage/components/TopModelsChart"), { ssr: false });
 
 function timeAgo(timestamp) {
   const diff = Math.floor((Date.now() - new Date(timestamp)) / 1000);
@@ -42,49 +41,55 @@ function TimeAgo({ timestamp }) {
 }
 
 function RecentRequests({ requests = [] }) {
-  return (
-    <Card className="flex min-w-0 flex-col overflow-hidden" padding="sm" style={{ height: 480 }}>
-      {/* Header */}
-      <div className="px-1 py-2 border-b border-border shrink-0">
-        <span className="text-xs font-semibold text-text-muted uppercase tracking-wide">Recent Requests</span>
+  if (!requests.length) {
+    return (
+      <div className="py-16 flex items-center justify-center text-[#9c9ca4] text-xs">
+        No recent gateway requests yet.
       </div>
+    );
+  }
 
-      {!requests.length ? (
-        <div className="flex-1 flex items-center justify-center text-text-muted text-sm">No requests yet.</div>
-      ) : (
-        <div className="flex-1 overflow-y-auto">
-          <table className="w-full min-w-[300px] border-collapse text-xs">
-            <thead className="sticky top-0 bg-bg z-10">
-              <tr className="border-b border-border">
-                <th className="py-1.5 text-left font-semibold text-text-muted w-2"></th>
-                <th className="py-1.5 text-left font-semibold text-text-muted">Model</th>
-                <th className="py-1.5 text-right font-semibold text-text-muted whitespace-nowrap">In / Out</th>
-                <th className="py-1.5 text-right font-semibold text-text-muted">When</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/50">
-              {requests.map((r, i) => {
-                const ok = !r.status || r.status === "ok" || r.status === "success";
-                return (
-                  <tr key={i} className="hover:bg-bg-subtle transition-colors">
-                    <td className="py-1.5">
-                      <span className={`block w-1.5 h-1.5 rounded-full ${ok ? "bg-success" : "bg-error"}`} />
-                    </td>
-                    <td className="py-1.5 font-mono truncate max-w-[120px]" title={r.model}>{r.model}</td>
-                    <td className="py-1.5 text-right whitespace-nowrap">
-                      <span className="text-primary">{fmt(r.promptTokens)}↑</span>
-                      {" "}
-                      <span className="text-success">{fmt(r.completionTokens)}↓</span>
-                    </td>
-                    <td className="py-1.5 text-right text-text-muted whitespace-nowrap"><TimeAgo timestamp={r.timestamp} /></td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </Card>
+  return (
+    <div className="space-y-2.5 overflow-y-auto max-h-[380px] pr-1">
+      {requests.map((r, i) => {
+        const ok = !r.status || r.status === "ok" || r.status === "success" || r.status === 200;
+        const reqShortId = r.id ? String(r.id).slice(-5) : `${i + 1}a`;
+        return (
+          <div
+            key={i}
+            className="p-3 bg-[#17171d] border border-[#23242e] hover:border-[#353644] transition-all flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="min-w-0">
+                <div className="text-xs font-semibold text-[#ededef] flex items-center gap-1.5 flex-wrap">
+                  <span className="font-mono truncate max-w-[150px]" title={r.model}>
+                    {r.model || "standard"}
+                  </span>
+                  <span
+                    className={`px-1.5 py-0.5 text-[9px] font-mono shrink-0 ${
+                      ok ? "bg-[#22222a] text-[#c5a880]" : "bg-[#351515] text-[#ef4444]"
+                    }`}
+                  >
+                    {ok ? "200 OK" : "500 ERR"}
+                  </span>
+                </div>
+                <div className="text-[10px] text-[#9c9ca4] font-mono mt-0.5 truncate">
+                  req_{reqShortId} · {r.provider || "Direct"} · <TimeAgo timestamp={r.timestamp} />
+                </div>
+              </div>
+            </div>
+            <div className="text-right font-mono text-[11px] shrink-0 ml-2">
+              <div className="text-[#c5a880] font-semibold">
+                {fmt(r.promptTokens)}↑ <span className="text-[#10b981]">{fmt(r.completionTokens)}↓</span>
+              </div>
+              <div className="text-[10px] text-[#9c9ca4]">
+                {r.cost ? `$${r.cost.toFixed(3)}` : "—"} {r.durationMs ? `· ${r.durationMs}ms` : ""}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -471,61 +476,97 @@ export default function UsageStats({ period: periodProp, setPeriod: setPeriodPro
       {/* Overview cards */}
       {loading ? spinner : <OverviewCards stats={stats} />}
 
-      {/* Provider topology + Recent Requests */}
+      {/* Real-time Model Flow Routing & Recent Gateway Requests */}
       {loading ? spinner : (
-        <div className="grid min-w-0 grid-cols-1 items-stretch gap-2 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
-          <ProviderTopology
-            providers={providers}
-            activeRequests={stats.activeRequests || []}
-            lastProvider={stats.recentRequests?.[0]?.provider || ""}
-            errorProvider={stats.errorProvider || ""}
-          />
-          <RecentRequests requests={stats.recentRequests || []} />
-        </div>
-      )}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch">
+          {/* Real-time Model Flow Routing (3 cols - aligns with cards 1, 2, 3) */}
+          <div className="lg:col-span-3 h-full">
+            <ModelFlowRouting
+              providers={providers}
+              activeRequests={stats.activeRequests || []}
+              recentRequests={stats.recentRequests || []}
+              byProvider={stats.byProvider || {}}
+              stats={stats}
+            />
+          </div>
 
-      {/* Token / Cost chart - sync period */}
-      {loading ? spinner : <UsageChart period={period} />}
-
-      {/* Provider and model breakdown charts */}
-      {!loading && (stats.byProvider || stats.byModel) && (
-        <div className="grid min-w-0 grid-cols-1 gap-2 lg:grid-cols-2">
-          <ProviderBarChart byProvider={stats.byProvider} />
-          <TopModelsChart byModel={stats.byModel} />
-        </div>
-      )}
-
-      {/* Table with dropdown selector */}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <select
-            value={tableView}
-            onChange={(e) => setTableView(e.target.value)}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text-main focus:outline-none focus:ring-2 focus:ring-primary/50 sm:w-auto"
-            style={{ colorScheme: 'auto' }}
-          >
-            {TABLE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <div className="grid grid-cols-2 items-center gap-1 rounded-lg border border-border bg-bg-subtle p-1 sm:flex">
-            <button
-              onClick={() => setViewMode("costs")}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${viewMode === "costs" ? "bg-primary text-white shadow-sm" : "text-text-muted hover:text-text hover:bg-bg-hover"}`}
-            >
-              Costs
-            </button>
-            <button
-              onClick={() => setViewMode("tokens")}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${viewMode === "tokens" ? "bg-primary text-white shadow-sm" : "text-text-muted hover:text-text hover:bg-bg-hover"}`}
-            >
-              Tokens
-            </button>
+          {/* Recent Gateway Requests (2 cols - aligns with cards 4, 5: Output Tokens & Est Cost) */}
+          <div className="lg:col-span-2 bg-[#121216] border border-[#23242a] p-6 flex flex-col justify-between shadow-sm h-full">
+            <div className="flex items-center justify-between border-b border-[#23242a] pb-4 mb-4 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-lg text-[#3b82f6]">schedule</span>
+                <h2 className="text-sm font-semibold text-[#ededef]">Recent Gateway Requests</h2>
+              </div>
+            </div>
+            <div className="flex-1 min-h-0">
+              <RecentRequests requests={stats.recentRequests || []} />
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Analytics & Provider Share */}
+      {loading ? spinner : (
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch">
+          <div className="lg:col-span-3 h-full">
+            <UsageChart period={period} stats={stats} />
+          </div>
+          <div className="lg:col-span-2 h-full">
+            <ProviderBarChart
+              byProvider={stats.byProvider}
+              totalTokens={(stats.totalPromptTokens || 0) + (stats.totalCompletionTokens || 0)}
+              totalCachedTokens={stats.totalCachedTokens || 0}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Usage Breakdown Table */}
+      <div className="bg-[#121216] border border-[#23242a] p-6 shadow-sm flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#23242a] pb-4">
+          <div>
+            <h2 className="text-sm font-semibold text-[#ededef]">
+              {tableView === "model" ? "Usage Breakdown by Model" :
+               tableView === "account" ? "Usage Breakdown by Account" :
+               tableView === "apiKey" ? "Usage Breakdown by API Key" : "Usage Breakdown by Endpoint"}
+            </h2>
+            <p className="text-[11px] text-[#9c9ca4]">Comprehensive telemetry, prompt caching ratios &amp; billed cost</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <select
+              value={tableView}
+              onChange={(e) => setTableView(e.target.value)}
+              className="bg-[#1c1c24] border border-[#272834] px-3 py-1.5 text-xs font-medium text-[#ededef] focus:outline-none focus:border-[#c5a880] transition-colors"
+            >
+              {TABLE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+
+            <div className="inline-flex items-center p-0.5 bg-[#181820] border border-[#23242a]">
+              <button
+                onClick={() => setViewMode("costs")}
+                className={`px-3 py-1 text-xs font-medium transition-colors ${
+                  viewMode === "costs" ? "bg-[#242430] text-[#c5a880]" : "text-[#9c9ca4] hover:text-[#ededef]"
+                }`}
+              >
+                Costs
+              </button>
+              <button
+                onClick={() => setViewMode("tokens")}
+                className={`px-3 py-1 text-xs font-medium transition-colors ${
+                  viewMode === "tokens" ? "bg-[#242430] text-[#c5a880]" : "text-[#9c9ca4] hover:text-[#ededef]"
+                }`}
+              >
+                Tokens
+              </button>
+            </div>
+          </div>
+        </div>
+
         {loading ? spinner : activeTableConfig && (
           <UsageTable
-            title=""
             columns={activeTableConfig.columns}
             groupedData={activeTableConfig.groupedData}
             tableType={tableView}

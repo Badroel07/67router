@@ -36,11 +36,11 @@ function ProviderNode({ data }) {
   const [imgError, setImgError] = useState(false);
   return (
     <div
-      className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border-2 transition-all duration-300 bg-bg"
+      className="flex items-center gap-2.5 px-3.5 py-2 border transition-all duration-300 bg-[#15151a]"
       style={{
-        borderColor: active ? color : "var(--color-border)",
+        borderColor: active ? color : "#2b2c36",
         boxShadow: active ? `0 0 16px ${color}40` : "none",
-        minWidth: "150px",
+        minWidth: "140px",
       }}
     >
       <Handle type="target" position={Position.Top} id="top" className="!bg-transparent !border-0 !w-0 !h-0" />
@@ -50,14 +50,14 @@ function ProviderNode({ data }) {
 
       {/* Provider icon */}
       <div
-        className="w-8 h-8 rounded-md flex items-center justify-center shrink-0"
+        className="w-7 h-7 flex items-center justify-center shrink-0"
         style={{ backgroundColor: `${color}15` }}
       >
         {imageUrl && !imgError ? (
           <img
             src={imageUrl}
             alt={label}
-            className="w-6 h-6 rounded-sm object-contain"
+            className="w-5 h-5 object-contain"
             loading="lazy"
             decoding="async"
             onError={() => {
@@ -67,21 +67,21 @@ function ProviderNode({ data }) {
             }}
           />
         ) : (
-          <span className="text-sm font-bold" style={{ color }}>{textIcon}</span>
+          <span className="text-xs font-bold" style={{ color }}>{textIcon}</span>
         )}
       </div>
 
       {/* Provider name */}
       <span
-        className="text-base font-medium truncate"
-        style={{ color: active ? color : "var(--color-text)" }}
+        className="text-xs font-semibold truncate"
+        style={{ color: active ? color : "#ededef" }}
       >
         {label}
       </span>
 
       {/* Active indicator */}
       {active && (
-        <span className="relative flex h-2 w-2 shrink-0">
+        <span className="relative flex h-2 w-2 shrink-0 ml-auto">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: color }} />
           <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: color }} />
         </span>
@@ -94,15 +94,15 @@ ProviderNode.propTypes = {
   data: PropTypes.object.isRequired,
 };
 
-// Center 9Router node — pulse/glow on card only (no expanding rings)
+// Center 9Router / 67Router node matching Stitch Hub
 function RouterNode({ data }) {
   const powering = (data.activeCount || 0) > 0;
   return (
     <div
-      className={`relative z-[1] flex items-center justify-center px-5 py-3 rounded-xl border-2 min-w-[130px] ${
+      className={`relative z-[1] flex items-center justify-center px-4 py-2.5 border-2 min-w-[130px] transition-all ${
         powering
-          ? "topology-router-core border-yellow-300 bg-gradient-to-br from-primary/30 via-yellow-400/20 to-cyan-400/25"
-          : "border-primary bg-primary/5 shadow-md"
+          ? "border-[#c5a880] bg-gradient-to-b from-[#1c1c24] to-[#14141a] shadow-lg shadow-[#c5a880]/20"
+          : "border-[#c5a880] bg-gradient-to-b from-[#1c1c24] to-[#14141a] shadow-md"
       }`}
     >
       <Handle type="source" position={Position.Top} id="top" className="!bg-transparent !border-0 !w-0 !h-0" />
@@ -112,16 +112,16 @@ function RouterNode({ data }) {
 
       <img
         src="/favicon.svg"
-        alt="9Router"
-        className={`w-6 h-6 mr-2 ${powering ? "topology-router-icon" : ""}`}
+        alt="67Router"
+        className={`w-5 h-5 mr-2 ${powering ? "topology-router-icon" : ""}`}
         loading="lazy"
         decoding="async"
       />
-      <span className={`text-sm font-bold ${powering ? "topology-router-label text-yellow-300" : "text-primary"}`}>
-        9Router
+      <span className="text-xs font-bold text-[#c5a880] tracking-wide">
+        67Router Hub
       </span>
       {data.activeCount > 0 && (
-        <span className="ml-2 px-1.5 py-0.5 rounded-full bg-yellow-400 text-black text-xs font-bold topology-router-badge">
+        <span className="ml-2 px-1.5 py-0.2 bg-[#c5a880]/20 text-[#c5a880] text-[10px] font-bold">
           {data.activeCount}
         </span>
       )}
@@ -354,7 +354,13 @@ function buildLayout(providers, activeSet, lastSet, errorSet) {
   return { nodes, edges };
 }
 
-export default function ProviderTopology({ providers = [], activeRequests = [], lastProvider = "", errorProvider = "" }) {
+export default function ProviderTopology({
+  providers = [],
+  activeRequests = [],
+  lastProvider = "",
+  errorProvider = "",
+  className = "",
+}) {
   // Serialize to stable string keys so useMemo only re-runs when values actually change
   const activeKey = useMemo(
     () => activeRequests.map((r) => r.provider?.toLowerCase()).filter(Boolean).sort().join(","),
@@ -437,7 +443,7 @@ export default function ProviderTopology({ providers = [], activeRequests = [], 
   }, [nodes.length]);
 
   return (
-    <div ref={containerRef} className="h-[320px] w-full min-w-0 rounded-lg border border-border bg-bg-subtle/30 sm:h-[480px]">
+    <div ref={containerRef} className={className || "h-[320px] w-full min-w-0 bg-transparent sm:h-[400px]"}>
       {providers.length === 0 ? (
         <div className="h-full flex items-center justify-center text-text-muted text-sm">
           No providers connected

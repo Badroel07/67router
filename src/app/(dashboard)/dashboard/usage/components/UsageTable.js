@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo, Fragment } from "react";
 import PropTypes from "prop-types";
-import Card from "@/shared/components/Card";
-import Badge from "@/shared/components/Badge";
 
 const fmt = (n) => new Intl.NumberFormat().format(n || 0);
 const fmtCost = (n) => `$${(n || 0).toFixed(2)}`;
@@ -19,7 +17,7 @@ function fmtTime(iso) {
 
 function SortIcon({ field, currentSort, currentOrder }) {
   if (currentSort !== field) return <span className="ml-1 opacity-20">↕</span>;
-  return <span className="ml-1">{currentOrder === "asc" ? "↑" : "↓"}</span>;
+  return <span className="ml-1 text-[#c5a880]">{currentOrder === "asc" ? "↑" : "↓"}</span>;
 }
 
 SortIcon.propTypes = {
@@ -28,23 +26,20 @@ SortIcon.propTypes = {
   currentOrder: PropTypes.string.isRequired,
 };
 
-/**
- * Render 3 token or cost cells based on viewMode
- */
 function ValueCells({ item, viewMode, isSummary = false }) {
   if (viewMode === "tokens") {
     return (
       <>
-        <td className="px-6 py-3 text-right text-text-muted">
+        <td className="px-5 py-3 text-right text-[#c5a880] font-mono">
           {isSummary && item.promptTokens === undefined ? "—" : fmt(item.promptTokens)}
         </td>
-        <td className="px-6 py-3 text-right text-text-muted">
+        <td className="px-5 py-3 text-right text-[#60a5fa] font-mono">
           {item.cachedTokens ? fmt(item.cachedTokens) : "—"}
         </td>
-        <td className="px-6 py-3 text-right text-text-muted">
+        <td className="px-5 py-3 text-right text-[#34d399] font-mono">
           {isSummary && item.completionTokens === undefined ? "—" : fmt(item.completionTokens)}
         </td>
-        <td className="px-6 py-3 text-right font-medium">
+        <td className="px-5 py-3 text-right font-mono font-bold text-[#ededef]">
           {fmt(item.totalTokens)}
         </td>
       </>
@@ -52,16 +47,16 @@ function ValueCells({ item, viewMode, isSummary = false }) {
   }
   return (
     <>
-      <td className="px-6 py-3 text-right text-text-muted">
+      <td className="px-5 py-3 text-right text-[#ededef] font-mono">
         {isSummary && item.inputCost === undefined ? "—" : fmtCost(item.inputCost)}
       </td>
-      <td className="px-6 py-3 text-right text-text-muted">
+      <td className="px-5 py-3 text-right text-[#60a5fa] font-mono">
         {item.cachedCost ? fmtCost(item.cachedCost) : "—"}
       </td>
-      <td className="px-6 py-3 text-right text-text-muted">
+      <td className="px-5 py-3 text-right text-[#34d399] font-mono">
         {isSummary && item.outputCost === undefined ? "—" : fmtCost(item.outputCost)}
       </td>
-      <td className="px-6 py-3 text-right font-medium text-warning">
+      <td className="px-5 py-3 text-right font-mono font-bold text-[#fbbf24]">
         {fmtCost(item.totalCost || item.cost)}
       </td>
     </>
@@ -74,24 +69,6 @@ ValueCells.propTypes = {
   isSummary: PropTypes.bool,
 };
 
-/**
- * Reusable sortable usage table with expandable group rows.
- *
- * @param {object} props
- * @param {string} props.title - Table title
- * @param {Array} props.columns - Column definitions [{field, label}]
- * @param {Array} props.groupedData - Grouped data from groupDataByKey
- * @param {string} props.tableType - Table type key for sort URL params
- * @param {string} props.sortBy - Current sort field
- * @param {string} props.sortOrder - Current sort order
- * @param {function} props.onToggleSort - Sort toggle handler
- * @param {string} props.viewMode - "tokens" or "costs"
- * @param {string} props.storageKey - localStorage key for expanded state
- * @param {function} props.renderGroupLabel - Render group summary first cell content
- * @param {function} props.renderDetailCells - Render detail row custom cells (before value cells)
- * @param {function} props.renderSummaryCells - Render summary row cells after group label (placeholder cols)
- * @param {string} props.emptyMessage - Empty state message
- */
 export default function UsageTable({
   title,
   columns,
@@ -106,19 +83,16 @@ export default function UsageTable({
   renderSummaryCells,
   emptyMessage,
 }) {
-  const [expanded, setExpanded] = useState(new Set());
-
-  // Load expanded state from localStorage
-  useEffect(() => {
+  const [expanded, setExpanded] = useState(() => {
+    if (typeof window === "undefined") return new Set();
     try {
       const saved = localStorage.getItem(storageKey);
-      if (saved) setExpanded(new Set(JSON.parse(saved)));
-    } catch (e) {
-      console.error(`Failed to load ${storageKey}:`, e);
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
     }
-  }, [storageKey]);
+  });
 
-  // Save expanded state to localStorage
   useEffect(() => {
     try {
       localStorage.setItem(storageKey, JSON.stringify([...expanded]));
@@ -154,19 +128,54 @@ export default function UsageTable({
 
   const totalColSpan = columns.length + valueColumns.length;
 
+  const totals = useMemo(() => {
+    return groupedData.reduce(
+      (acc, g) => {
+        const s = g.summary || {};
+        acc.requests += s.requests || 0;
+        acc.promptTokens += s.promptTokens || 0;
+        acc.cachedTokens += s.cachedTokens || 0;
+        acc.completionTokens += s.completionTokens || 0;
+        acc.totalTokens += s.totalTokens || 0;
+        acc.inputCost += s.inputCost || 0;
+        acc.cachedCost += s.cachedCost || 0;
+        acc.outputCost += s.outputCost || 0;
+        acc.cost += s.cost || 0;
+        acc.totalCost += s.totalCost || s.cost || 0;
+        return acc;
+      },
+      {
+        requests: 0,
+        promptTokens: 0,
+        cachedTokens: 0,
+        completionTokens: 0,
+        totalTokens: 0,
+        inputCost: 0,
+        cachedCost: 0,
+        outputCost: 0,
+        cost: 0,
+        totalCost: 0,
+      }
+    );
+  }, [groupedData]);
+
   return (
-    <Card className="overflow-hidden">
-      <div className="p-4 border-b border-border bg-bg-subtle/50">
-        <h3 className="font-semibold">{title}</h3>
-      </div>
+    <div className="bg-[#121216] border border-[#23242a] shadow-sm overflow-hidden">
+      {title && (
+        <div className="p-4 border-b border-[#23242a] bg-[#16161c]/40">
+          <h3 className="font-semibold text-sm text-[#ededef]">{title}</h3>
+        </div>
+      )}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-bg-subtle/30 text-text-muted uppercase text-xs">
+        <table className="w-full text-xs text-left">
+          <thead className="bg-[#16161c]/70 text-[#9c9ca4] uppercase text-[10px] tracking-wider border-b border-[#23242a] font-semibold">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.field}
-                  className={`px-6 py-3 cursor-pointer hover:bg-bg-subtle/50 ${col.align === "right" ? "text-right" : ""}`}
+                  className={`px-5 py-3 cursor-pointer hover:bg-[#1a1a22] transition-colors ${
+                    col.align === "right" ? "text-right" : ""
+                  }`}
                   onClick={() => onToggleSort(tableType, col.field)}
                 >
                   {col.label}{" "}
@@ -176,7 +185,7 @@ export default function UsageTable({
               {valueColumns.map((col) => (
                 <th
                   key={col.field}
-                  className="px-6 py-3 text-right cursor-pointer hover:bg-bg-subtle/50"
+                  className="px-5 py-3 text-right cursor-pointer hover:bg-[#1a1a22] transition-colors"
                   onClick={() => onToggleSort(tableType, col.field)}
                 >
                   {col.label}{" "}
@@ -185,20 +194,19 @@ export default function UsageTable({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-[#1e1e26] font-mono">
             {groupedData.map((group) => (
               <Fragment key={group.groupKey}>
-                {/* Group summary row */}
                 <tr
-                  className="group-summary cursor-pointer hover:bg-bg-subtle/50 transition-colors"
+                  className="cursor-pointer hover:bg-[#16161d] transition-colors"
                   onClick={() => toggleGroup(group.groupKey)}
                 >
-                  <td className="px-6 py-3">
+                  <td className="px-5 py-3.5">
                     <div className="flex items-center gap-2">
-                      <span className={`material-symbols-outlined text-[18px] text-text-muted transition-transform ${expanded.has(group.groupKey) ? "rotate-90" : ""}`}>
+                      <span className={`material-symbols-outlined text-[16px] text-[#9c9ca4] transition-transform ${expanded.has(group.groupKey) ? "rotate-90" : ""}`}>
                         chevron_right
                       </span>
-                      <span className={`font-medium transition-colors ${group.summary.pending > 0 ? "text-primary" : ""}`}>
+                      <span className={`font-medium transition-colors ${group.summary.pending > 0 ? "text-[#c5a880]" : "text-[#ededef]"}`}>
                         {group.groupKey}
                       </span>
                     </div>
@@ -206,11 +214,10 @@ export default function UsageTable({
                   {renderSummaryCells(group)}
                   <ValueCells item={group.summary} viewMode={viewMode} isSummary />
                 </tr>
-                {/* Detail rows */}
                 {expanded.has(group.groupKey) && group.items.map((item) => (
                   <tr
                     key={`detail-${item.key}`}
-                    className="group-detail hover:bg-bg-subtle/20 transition-colors"
+                    className="bg-[#0e0e12]/60 hover:bg-[#16161d] transition-colors"
                   >
                     {renderDetailCells(item)}
                     <ValueCells item={item} viewMode={viewMode} />
@@ -220,20 +227,31 @@ export default function UsageTable({
             ))}
             {groupedData.length === 0 && (
               <tr>
-                <td colSpan={totalColSpan} className="px-6 py-8 text-center text-text-muted">
+                <td colSpan={totalColSpan} className="px-6 py-8 text-center text-[#9c9ca4] font-sans">
                   {emptyMessage}
                 </td>
               </tr>
             )}
           </tbody>
+          {groupedData.length > 0 && (
+            <tfoot className="border-t border-[#23242a] font-mono text-xs font-semibold text-[#ededef] bg-[#16161c]/50">
+              <tr>
+                <td className="px-5 py-3 font-sans">Total</td>
+                <td className="px-5 py-3 font-sans text-[#9c9ca4]">{groupedData.length} Groups</td>
+                <td className="px-5 py-3 text-right">{fmt(totals.requests)}</td>
+                <td className="px-5 py-3 text-right text-[#9c9ca4]">—</td>
+                <ValueCells item={totals} viewMode={viewMode} isSummary />
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
-    </Card>
+    </div>
   );
 }
 
 UsageTable.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   columns: PropTypes.arrayOf(PropTypes.shape({
     field: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
@@ -251,5 +269,4 @@ UsageTable.propTypes = {
   emptyMessage: PropTypes.string.isRequired,
 };
 
-// Re-export utilities for use in UsageStats orchestrator
 export { fmt, fmtCost, fmtTime };
