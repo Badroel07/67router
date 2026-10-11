@@ -478,7 +478,7 @@ export default function UsageStats({ period: periodProp, setPeriod: setPeriodPro
 
       {/* Real-time Model Flow Routing & Recent Gateway Requests */}
       {loading ? spinner : (
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch lg:h-[460px]">
           {/* Real-time Model Flow Routing (3 cols - aligns with cards 1, 2, 3) */}
           <div className="lg:col-span-3 h-full">
             <ModelFlowRouting
@@ -490,7 +490,7 @@ export default function UsageStats({ period: periodProp, setPeriod: setPeriodPro
           </div>
 
           {/* Recent Gateway Requests (2 cols - aligns with cards 4, 5: Output Tokens & Est Cost) */}
-          <div className="lg:col-span-2 bg-[#121216] border border-[#23242a] p-6 flex flex-col shadow-sm h-full">
+          <div className="lg:col-span-2 bg-[#121216] border border-[#23242a] p-6 flex flex-col shadow-sm h-full max-h-[460px]">
             <div className="flex items-center justify-between border-b border-[#23242a] pb-4 mb-4 shrink-0">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-lg text-[#3b82f6]">schedule</span>

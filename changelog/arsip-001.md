@@ -4,6 +4,17 @@ Bagian dari sistem changelog terpecah per batas ukuran. Indeks lengkap: [`CHANGE
 
 ## Riwayat Perubahan
 
+### [2026-10-11] - Batasi Tinggi Baris Routing & Recent Requests ke 460px (v1.0.9)
+- **Kategori**: UI/UX | Refactor | Layout
+- **File & Baris Terkait**:
+  - `src/shared/components/UsageStats.js:480-505` (mengunci tinggi baris grid di layar besar menjadi `lg:h-[460px]` dan kartu Recent Requests `max-h-[460px]`, sehingga daftar permintaan recent tidak lagi melar terlalu panjang ke bawah)
+  - `src/app/(dashboard)/dashboard/usage/components/ModelFlowRouting.js:30` (membuat ProviderTopology mengisi `h-full` fleksibel tanpa min-height statis yang mendorong batas kartu)
+  - `package.json:3`, `cli/package.json:3`, `cli/app/package.json:3` (kenaikan versi patch ke v1.0.9)
+- **Deskripsi Perubahan**:
+  - Membatasi ketinggian baris Model Flow Routing & Recent Gateway Requests agar proporsional, padat, dan rapi (maksimal 460px di layar desktop), dengan scrollbar vertikal di Recent Requests bila daftar item panjang.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Perubahan layout diterapkan dan divalidasi.
+
 ### [2026-10-11] - Hapus Flow View, Perbaiki Warna Tombol Zoom ReactFlow & Full-Height Recent Requests (v1.0.8)
 - **Kategori**: UI/UX | Refactor | Cleanup
 - **File & Baris Terkait**:

@@ -27,12 +27,13 @@ export default function ModelFlowRouting({
       </div>
 
       {/* Graph Canvas */}
-      <div className="flex-1 min-h-0 relative bg-[#0d0d10] border border-[#1d1d23] overflow-hidden" style={{ minHeight: 280 }}>
+      <div className="flex-1 min-h-0 relative bg-[#0d0d10] border border-[#1d1d23] overflow-hidden">
         <ProviderTopology
           providers={providers}
           activeRequests={activeRequests}
           lastProvider={recentRequests?.[0]?.provider || ""}
           errorProvider={stats?.errorProvider || ""}
+          className="h-full w-full min-w-0 bg-transparent"
         />
       </div>
 
