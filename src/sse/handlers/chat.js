@@ -278,8 +278,9 @@ async function handleSingleModelChat(body, modelStr, clientRawRequest = null, re
     // Use shared chatCore
     const chatSettings = await getSettings();
     const providerThinking = (chatSettings.providerThinking || {})[provider] || null;
+    const clientRequestedModel = body?.model || model;
     const result = await handleChatCore({
-      body: { ...body, model: `${provider}/${model}` },
+      body: { ...body, model: clientRequestedModel },
       modelInfo: { provider, model },
       credentials: refreshedCredentials,
       log,

@@ -1,4 +1,5 @@
 import REGISTRY from "../providers/registry/index.js";
+import { PROVIDER_MODELS } from "../config/providerModels.js";
 
 // Alias→id derived from registry single-source: id→id, alias→id, aliases[]→id.
 // Media-only providers without a registry transport entry keep explicit aliases here.
@@ -113,6 +114,17 @@ export async function getModelInfoCore(modelStr, aliasesOrGetter) {
     resolveModelAliasFromMap(parsed.model, BUILTIN_MODEL_ALIASES);
   if (resolved) {
     return resolved;
+  }
+
+  // Exact match against provider model IDs when no slash was provided
+  const bare = parsed.model;
+  for (const [pAlias, provModels] of Object.entries(PROVIDER_MODELS)) {
+    if (provModels.some(m => m.id === bare)) {
+      return {
+        provider: resolveProviderAlias(pAlias),
+        model: bare,
+      };
+    }
   }
 
   // Fallback: infer provider from model name prefix

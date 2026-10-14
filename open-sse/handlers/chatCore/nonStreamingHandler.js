@@ -24,7 +24,7 @@ function parseToolArguments(value) {
   }
 }
 
-function openAICompletionToClaudeMessage(responseBody) {
+function openAICompletionToClaudeMessage(responseBody, requestedModel = null) {
   if (!responseBody?.choices?.[0]) return responseBody;
   const choice = responseBody.choices[0];
   const message = choice.message || {};
@@ -53,7 +53,7 @@ function openAICompletionToClaudeMessage(responseBody) {
     id: String(responseBody.id || `msg_${Date.now()}`).replace(/^chatcmpl-/, ""),
     type: "message",
     role: "assistant",
-    model: responseBody.model || "unknown",
+    model: requestedModel || responseBody.model || "unknown",
     content,
     stop_reason: fromOpenAIFinish(choice.finish_reason, FORMATS.CLAUDE),
     stop_sequence: null,
@@ -214,6 +214,9 @@ export function translateNonStreamingResponse(responseBody, targetFormat, source
         result.usage.completion_tokens_details = { reasoning_tokens: usage.thoughtsTokenCount };
       }
     }
+    if (sourceFormat === FORMATS.CLAUDE) {
+      return openAICompletionToClaudeMessage(result, result.model);
+    }
     return result;
   }
 
@@ -351,6 +354,10 @@ export async function handleNonStreamingResponse({ providerResponse, provider, m
   if (!isClaudeMessageResponse && !isResponsesResponse) {
     if (!translatedResponse.object) translatedResponse.object = "chat.completion";
     if (!translatedResponse.created) translatedResponse.created = Math.floor(Date.now() / 1000);
+    if (body?.model) translatedResponse.model = body.model;
+    if (!translatedResponse.usage) {
+      translatedResponse.usage = { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 };
+    }
   }
 
   // Strip Azure-specific fields

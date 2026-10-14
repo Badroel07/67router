@@ -4,6 +4,34 @@ Bagian dari sistem changelog terpecah per batas ukuran. Indeks lengkap: [`CHANGE
 
 ## Riwayat Perubahan
 
+### [2026-10-14] - Fix SyntaxError Redeclaration, Echo Model Persis OpenDesign, & Bump ke v1.0.14
+- **Kategori**: Routing | Compatibility | Bug Fix | Release
+- **File & Baris Terkait**:
+  - `src/sse/handlers/chat.js:281-283` (perbaiki `const requestedModel` yang menimpa nama parameter fungsi sehingga modul chat gagal parse dan semua request 500 kosong; diganti menjadi `clientRequestedModel`, pertahankan `body.model` asli klien agar response echo persis)
+  - `package.json:3`, `cli/package.json:3`, `cli/app/package.json:3` (kenaikan versi patch ke v1.0.14)
+- **Deskripsi Perubahan**:
+  - Memperbaiki 500 kosong pada semua model setelah build sebelumnya dan memastikan response `model` selalu sama persis dengan request (`ag/gemini-3.8-flash-high` maupun bare `gemini-3.8-flash-high`), sehingga validasi ketat OpenDesign `responseModel !== requestedModel` lolos.
+  - Verifikasi live: `/v1/models` 42 entri (prefixed + bare), chat non-streaming echo persis + usage integer valid, vitest 119 lulus.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Build Next.js + CLI repackaging sukses, service di-restart (PID baru) dan terverifikasi live.
+
+### [2026-10-14] - Fix OpenAI & Anthropic Compatible Return Shapes & Model Mirroring for OpenDesign / External Clients
+- **Kategori**: Routing | Compatibility | API Standards
+- **File & Baris Terkait**:
+  - `open-sse/services/model.js:118-128`: Izinkan resolusi model ID langsung tanpa slash prefix (`gemini-3.8-flash-high`, `claude-sonnet-4-6`) mencocokkan model di catalog `PROVIDER_MODELS` secara otomatis.
+  - `open-sse/handlers/chatCore/nonStreamingHandler.js:27-66,215-218,350-358`: Kembalikan `model` sesuai request client pada non-streaming response; konversi response Gemini/Antigravity ke shape Claude Message valid saat client meminta via `/v1/messages`; pastikan objek `usage` selalu valid dengan integer tokens fallback (`prompt_tokens`, `completion_tokens`, `total_tokens`).
+  - `open-sse/handlers/chatCore/sseToJsonHandler.js:27-65,114-177,368-372`: Pastikan forced SSE to JSON mengembalikan response JSON utuh termasuk kompatibilitas Claude messages, penanganan Gemini candidates parts & finishReason, serta usage integer tokens lengkap.
+  - `open-sse/handlers/chatCore/streamingHandler.js:27-43`: Gunakan model yang diminta client (`body.model || model`) pada SSE transform stream logger dan framing.
+  - `src/app/api/v1/models/route.js:600-606`: Expose model ID baik dengan prefix maupun bare model ID di endpoint `/v1/models`.
+- **Deskripsi Perubahan**:
+  - Memperbaiki kegagalan validasi payload OpenAI/Anthropic pada client eksternal (termasuk OpenDesign daemon connection test):
+    1. Mengatasi error model mismatch `Provider responded with model "gemini-3.8-flash-n" instead of requested "ag/gemini-3.8-flash-high"`.
+    2. Menjamin field `usage` tidak pernah bernilai `{}` kosong melainkan selalu memenuhi skema valid OpenAI integer tokens.
+    3. Mengizinkan pemanggilan bare model name seperti `gemini-3.8-flash-high` dan `claude-sonnet-4-6`.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Seluruh perbaikan selesai, test vitest lulus 100%, Next.js standalone build & CLI repackaging sukses, service 9router di-restart dan terverifikasi live.
+
+
 ### [2026-10-11] - Redesain Total Semua Skeleton Loading Menyerupai Layout Asli (v1.0.13)
 - **Kategori**: UI/UX | Layout | Polish
 - **File & Baris Terkait**:

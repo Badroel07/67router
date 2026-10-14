@@ -597,6 +597,12 @@ export async function buildModelsList(kindFilter, options = {}) {
           if (Number.isFinite(maxOutput)) model.max_completion_tokens = maxOutput;
         }
         models.push(model);
+        if (outputAlias) {
+          models.push({
+            ...model,
+            id: modelId,
+          });
+        }
       }
 
       // Web search/fetch — provider IS the model, expose as {alias}/search and/or {alias}/fetch with explicit kind

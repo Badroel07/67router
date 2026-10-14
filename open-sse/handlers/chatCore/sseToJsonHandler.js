@@ -3,6 +3,7 @@ import { restoreToolNames } from "../../utils/opencodeFingerprint.js";
 import { createErrorResult } from "../../utils/error.js";
 import { HTTP_STATUS } from "../../config/runtimeConfig.js";
 import { FORMATS } from "../../translator/formats.js";
+import { fromOpenAIFinish } from "../../translator/concerns/finishReason.js";
 import { PROVIDERS } from "../../config/providers.js";
 import { buildRequestDetail, extractRequestConfig, saveUsageStats, formatDoneLine } from "./requestDetail.js";
 import { ROLE, RESPONSES_ITEM } from "../../translator/schema/index.js";
@@ -106,6 +107,56 @@ function chatCompletionToResponses(responseBody, customToolNames = null) {
   };
 }
 
+function parseToolArguments(value) {
+  if (!value) return {};
+  if (typeof value === "object") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return {};
+  }
+}
+
+function openAICompletionToClaudeMessage(responseBody, requestedModel = null) {
+  if (!responseBody?.choices?.[0]) return responseBody;
+  const choice = responseBody.choices[0];
+  const message = choice.message || {};
+  const content = [];
+
+  const reasoning = message.reasoning_content || message.provider_specific_fields?.reasoning_content || "";
+  if (reasoning) {
+    content.push({ type: "thinking", thinking: reasoning });
+  }
+  if (typeof message.content === "string" && message.content.length > 0) {
+    content.push({ type: "text", text: message.content });
+  }
+  for (const toolCall of message.tool_calls || []) {
+    const fn = toolCall.function || {};
+    content.push({
+      type: "tool_use",
+      id: toolCall.id || `toolu_${Date.now()}_${content.length}`,
+      name: fn.name || toolCall.name || "",
+      input: parseToolArguments(fn.arguments || toolCall.arguments),
+    });
+  }
+  if (content.length === 0) content.push({ type: "text", text: "" });
+
+  const usage = responseBody.usage || {};
+  return {
+    id: String(responseBody.id || `msg_${Date.now()}`).replace(/^chatcmpl-/, ""),
+    type: "message",
+    role: "assistant",
+    model: requestedModel || responseBody.model || "unknown",
+    content,
+    stop_reason: fromOpenAIFinish(choice.finish_reason, FORMATS.CLAUDE),
+    stop_sequence: null,
+    usage: {
+      input_tokens: usage.prompt_tokens || usage.input_tokens || 1,
+      output_tokens: usage.completion_tokens || usage.output_tokens || 1,
+    },
+  };
+}
+
 /**
  * Parse OpenAI-style SSE text into a single chat completion JSON.
  * Used when provider forces streaming but client wants non-streaming.
@@ -137,6 +188,38 @@ export function parseSSEToOpenAIResponse(rawSSE, fallbackModel) {
   let usage = null;
 
   for (const chunk of chunks) {
+    // Support raw Gemini/Antigravity event chunk
+    const resp = chunk?.response || chunk;
+    if (resp?.candidates?.[0]) {
+      const cand = resp.candidates[0];
+      if (cand.content?.parts) {
+        for (const p of cand.content.parts) {
+          if (p.thought === true && p.text) reasoningParts.push(p.text);
+          else if (p.text !== undefined) contentParts.push(p.text);
+          if (p.functionCall) {
+            const idx = toolCallMap.size;
+            toolCallMap.set(idx, {
+              id: p.functionCall.id || `call_${p.functionCall.name}_${Date.now()}_${idx}`,
+              type: "function",
+              function: { name: p.functionCall.name, arguments: JSON.stringify(p.functionCall.args || {}) }
+            });
+          }
+        }
+      }
+      if (cand.finishReason) finishReason = cand.finishReason.toLowerCase();
+    }
+    const metaUsage = resp?.usageMetadata || chunk?.usageMetadata;
+    if (metaUsage) {
+      usage = {
+        prompt_tokens: (metaUsage.promptTokenCount || 0) + (metaUsage.thoughtsTokenCount || 0),
+        completion_tokens: metaUsage.candidatesTokenCount || 0,
+        total_tokens: metaUsage.totalTokenCount || 0
+      };
+      if (metaUsage.thoughtsTokenCount > 0) {
+        usage.completion_tokens_details = { reasoning_tokens: metaUsage.thoughtsTokenCount };
+      }
+    }
+
     const choice = chunk?.choices?.[0];
     const delta = choice?.delta || {};
     if (typeof delta.content === "string" && delta.content.length > 0) contentParts.push(delta.content);
@@ -169,10 +252,11 @@ export function parseSSEToOpenAIResponse(rawSSE, fallbackModel) {
     id: first.id || `chatcmpl-${Date.now()}`,
     object: "chat.completion",
     created: first.created || Math.floor(Date.now() / 1000),
-    model: first.model || fallbackModel || "unknown",
+    model: fallbackModel || first.model || "unknown",
     choices: [{ index: 0, message, finish_reason: finishReason }]
   };
   if (usage) result.usage = usage;
+  else result.usage = { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 };
   return result;
 }
 
@@ -282,6 +366,10 @@ export async function handleForcedSSEToJson({ providerResponse, sourceFormat, ta
         };
       }
 
+      if (sourceFormat === FORMATS.CLAUDE) {
+        finalResp = openAICompletionToClaudeMessage(finalResp, model);
+      }
+
       return { success: true, response: new Response(JSON.stringify(restoreToolNames(finalResp, toolNameMap)), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }) };
     } catch (err) {
       console.error("[ChatCore] Responses API SSE→JSON failed:", err);
@@ -337,6 +425,7 @@ export async function handleForcedSSEToJson({ providerResponse, sourceFormat, ta
     // must not be left unable to account for its own token spend: a caller cannot tell
     // a 90%-cached request from a cheap one without this.
     if (usage && Object.keys(usage).length > 0) parsed.usage = usage;
+    if (body?.model) parsed.model = body.model;
 
     // Strip reasoning_content only when content is non-empty.
     // When content is empty (e.g. thinking models that used all tokens for reasoning),
@@ -358,7 +447,9 @@ export async function handleForcedSSEToJson({ providerResponse, sourceFormat, ta
     // already imports parseSSEToOpenAIResponse from this module.
     const finalBody = sourceFormat === FORMATS.OPENAI_RESPONSES
       ? chatCompletionToResponses(parsed, customToolNames)
-      : parsed;
+      : sourceFormat === FORMATS.CLAUDE
+        ? openAICompletionToClaudeMessage(parsed, body?.model || model)
+        : parsed;
 
     return { success: true, response: new Response(JSON.stringify(restoreToolNames(finalBody, toolNameMap)), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }) };
   } catch (err) {
