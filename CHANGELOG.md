@@ -11,4 +11,4 @@ Seluruh riwayat perubahan proyek diarsipkan dalam file terpisah per batas ukuran
 
 | Arsip | Rentang Tanggal | Jumlah Entri | Status | Deskripsi |
 | :--- | :--- | :--- | :--- | :--- |
-| [`changelog/arsip-001.md`](changelog/arsip-001.md) | 2026-05-15 s/d 2026-10-09 | 37 entri | **(aktif)** | Inisialisasi awal, migrasi riwayat v0.4.46 s/d v0.5.99, serta penambahan fitur Agent Skills (@antislop-code) v1.0.3 |
+| [`changelog/arsip-001.md`](changelog/arsip-001.md) | 2026-10-09 s/d 2026-10-16 | 17 entri | **(aktif)** | Inisialisasi awal, migrasi riwayat v0.4.46 s/d v0.5.99, penambahan fitur Agent Skills (@antislop-code), integrasi upstream v0.5.104, dan rilis v1.0.15 |

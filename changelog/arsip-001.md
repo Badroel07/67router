@@ -4,6 +4,16 @@ Bagian dari sistem changelog terpecah per batas ukuran. Indeks lengkap: [`CHANGE
 
 ## Riwayat Perubahan
 
+### [2026-10-16] - Bump Versi ke v1.0.15
+- **Kategori**: Release
+- **File & Baris Terkait**:
+  - `package.json:3`, `cli/package.json:3`, `cli/app/package.json:3` (kenaikan versi patch ke v1.0.15)
+- **Deskripsi Perubahan**:
+  - Menaikkan versi patch proyek dari `1.0.14` ke `1.0.15` pada paket dashboard utama dan CLI `67router` setelah penyelesaian sinkronisasi upstream v0.5.104.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Versi berhasil dinaikkan ke v1.0.15 dan siap dipublikasikan ke remote GitHub.
+
+
 ### [2026-10-16] - Sync Upstream 9router v0.5.104 dengan Mempertahankan Kustomisasi 67router
 - **Kategori**: Upstream Sync | Compatibility | Architecture
 - **File & Baris Terkait**:
