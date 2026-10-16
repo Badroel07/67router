@@ -3,7 +3,7 @@ import { restoreToolNames } from "../../utils/opencodeFingerprint.js";
 import { createErrorResult } from "../../utils/error.js";
 import { HTTP_STATUS } from "../../config/runtimeConfig.js";
 import { FORMATS } from "../../translator/formats.js";
-import { fromOpenAIFinish } from "../../translator/concerns/finishReason.js";
+import { openAICompletionToClaudeMessage } from "../../translator/concerns/claudeMessage.js";
 import { PROVIDERS } from "../../config/providers.js";
 import { buildRequestDetail, extractRequestConfig, saveUsageStats, formatDoneLine } from "./requestDetail.js";
 import { ROLE, RESPONSES_ITEM } from "../../translator/schema/index.js";
@@ -107,55 +107,6 @@ function chatCompletionToResponses(responseBody, customToolNames = null) {
   };
 }
 
-function parseToolArguments(value) {
-  if (!value) return {};
-  if (typeof value === "object") return value;
-  try {
-    return JSON.parse(value);
-  } catch {
-    return {};
-  }
-}
-
-function openAICompletionToClaudeMessage(responseBody, requestedModel = null) {
-  if (!responseBody?.choices?.[0]) return responseBody;
-  const choice = responseBody.choices[0];
-  const message = choice.message || {};
-  const content = [];
-
-  const reasoning = message.reasoning_content || message.provider_specific_fields?.reasoning_content || "";
-  if (reasoning) {
-    content.push({ type: "thinking", thinking: reasoning });
-  }
-  if (typeof message.content === "string" && message.content.length > 0) {
-    content.push({ type: "text", text: message.content });
-  }
-  for (const toolCall of message.tool_calls || []) {
-    const fn = toolCall.function || {};
-    content.push({
-      type: "tool_use",
-      id: toolCall.id || `toolu_${Date.now()}_${content.length}`,
-      name: fn.name || toolCall.name || "",
-      input: parseToolArguments(fn.arguments || toolCall.arguments),
-    });
-  }
-  if (content.length === 0) content.push({ type: "text", text: "" });
-
-  const usage = responseBody.usage || {};
-  return {
-    id: String(responseBody.id || `msg_${Date.now()}`).replace(/^chatcmpl-/, ""),
-    type: "message",
-    role: "assistant",
-    model: requestedModel || responseBody.model || "unknown",
-    content,
-    stop_reason: fromOpenAIFinish(choice.finish_reason, FORMATS.CLAUDE),
-    stop_sequence: null,
-    usage: {
-      input_tokens: usage.prompt_tokens || usage.input_tokens || 1,
-      output_tokens: usage.completion_tokens || usage.output_tokens || 1,
-    },
-  };
-}
 
 /**
  * Parse OpenAI-style SSE text into a single chat completion JSON.

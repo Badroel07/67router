@@ -390,6 +390,77 @@ Default local endpoints:
 </details>
 
 <details>
+<summary><b>🎁 Free Unlimited Providers</b></summary>
+
+### Kiro AI (Claude 4.5 + GLM-5 + MiniMax FREE)
+
+```bash
+Dashboard → Connect Kiro
+→ AWS Builder ID, AWS IAM Identity Center, Google, or GitHub
+→ Unlimited usage
+
+Models:
+  kr/claude-sonnet-4.5
+  kr/claude-haiku-4.5
+  kr/glm-5
+  kr/MiniMax-M2.5
+  kr/qwen3-coder-next
+  kr/deepseek-3.2
+```
+
+**Pro Tip:** Best free option for Claude. No API key, no payment, fully unlimited.
+
+### OpenCode Free (No auth, auto-fetch models)
+
+```bash
+Dashboard → Connect OpenCode Free
+→ No login required (passthrough proxy)
+→ Models auto-fetched from opencode.ai/zen/v1/models
+```
+
+**Pro Tip:** Fastest setup. Just connect and start coding.
+
+### Vertex AI ($300 free credits for new GCP accounts)
+
+```bash
+Dashboard → Connect Vertex AI
+→ Upload Google Cloud Service Account JSON
+→ Enable Vertex AI API in your GCP project
+
+Models:
+  vertex/gemini-3.1-pro-preview
+  vertex/gemini-3-flash-preview
+  vertex/gemini-2.5-flash
+
+Vertex Partner (Anthropic / DeepSeek / GLM / Qwen via Vertex):
+  vertex-partner/glm-5-maas
+  vertex-partner/deepseek-v3.2-maas
+  vertex-partner/qwen3-next-80b-a3b-thinking-maas
+```
+
+For a raw Google Cloud API-key connection, set the following through
+`PUT /api/providers/<connection-id>` to select the global endpoint:
+
+```json
+{
+  "providerSpecificData": {
+    "projectId": "YOUR_GOOGLE_CLOUD_PROJECT_ID",
+    "location": "global"
+  }
+}
+```
+
+With an explicit project, API-key requests honor `location` and default to
+`global` when it is omitted. Connections without an explicit project retain
+the projectless endpoint. Gemini 4 Argon supports `global`, `us`, and `eu`,
+not regional locations such as `europe-west1`; see
+[Google's supported locations](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/4-argon).
+
+**Pro Tip:** New Google Cloud accounts get $300 credits free for 90 days. Plenty for daily coding.
+
+</details>
+
+<details>
 <summary><b>🎨 Custom Combos & Smart Fallback</b></summary>
 
 Create unlimited smart fallback chains in **Dashboard → Combos**:

@@ -4,6 +4,22 @@ Bagian dari sistem changelog terpecah per batas ukuran. Indeks lengkap: [`CHANGE
 
 ## Riwayat Perubahan
 
+### [2026-10-16] - Sync Upstream 9router v0.5.104 dengan Mempertahankan Kustomisasi 67router
+- **Kategori**: Upstream Sync | Compatibility | Architecture
+- **File & Baris Terkait**:
+  - `open-sse/translator/concerns/claudeMessage.js:15-16,44`: Dukung parameter `requestedModel` pada helper `openAICompletionToClaudeMessage` agar response Claude format tetap mempertahankan mirroring model ID asli permintaan client.
+  - `open-sse/handlers/chatCore/nonStreamingHandler.js:14-17`: Hapus deklarasi fungsi helper lokal ganda dan gunakan modul terpusat upstream `claudeMessage.js`.
+  - `open-sse/handlers/chatCore/sseToJsonHandler.js:6-10,110-158,325-330,410-415`: Bersihkan fungsi helper lokal redundan, gunakan import terpusat `claudeMessage.js` dan pertahankan passing requested model dari 67router.
+  - `src/shared/components/Button.js:16`: Integrasikan varian ukuran baru `xs` dari upstream dengan tetap mempertahankan estetika `rounded-none` tema brutalist 67router.
+  - `cli/package.json:2-10`, `package.json:2-10`: Pertahankan penamaan paket `67router` / `67router-app`, branding CLI, dan versi `1.0.14`.
+  - `README.md:381-456`: Gabungkan dokumentasi fitur baru upstream (Kiro AI, OpenCode Free, Vertex AI Gemini 4 Argon) bersama fitur eksklusif 67router (OpenCode Fetch All Models, Agent Skills antislop-code).
+  - `CHANGELOG.md:1-76`: Pertahankan format indeks changelog terpecah per arsip sesuai standar arsitektur 67router.
+- **Deskripsi Perubahan**:
+  - Melakukan sinkronisasi penuh commit dari `upstream/master` (mencakup rilis v0.5.100 hingga v0.5.104 decolua/9router: Gemini 4 Argon, per-key token quota, Cursor IDE quota & Auto model resolution, timezone auto-ping schedule, Nous Research OAuth + free tier, model picker regex search, dll.) tanpa menimpa atau merusak kustomisasi kode 67router.
+  - Menyelesaikan seluruh merge conflict dengan presisi teknis dan memverifikasi kelulusan build Next.js serta CLI packaging.
+- **Status Selesai (Anti-Duplikasi AI)**:
+  - Sinkronisasi upstream v0.5.104 selesai, conflict resolusi tuntas, Next.js build dan CLI build lulus 100%.
+
 ### [2026-10-14] - Fix SyntaxError Redeclaration, Echo Model Persis OpenDesign, & Bump ke v1.0.14
 - **Kategori**: Routing | Compatibility | Bug Fix | Release
 - **File & Baris Terkait**:

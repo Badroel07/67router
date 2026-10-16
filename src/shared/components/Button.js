@@ -13,6 +13,7 @@ const variants = {
 };
 
 const sizes = {
+  xs: "h-6 px-2.5 text-[11px] rounded-none gap-1.5",
   sm: "h-7 px-2.5 text-xs rounded-none",
   md: "h-8.5 px-3.5 text-xs rounded-none",
   lg: "h-10 px-4 text-sm rounded-none",
@@ -44,13 +45,13 @@ export default function Button({
       {...props}
     >
       {loading ? (
-        <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+        <span className={cn("material-symbols-outlined animate-spin", size === "xs" ? "text-[14px]" : "text-[18px]")}>progress_activity</span>
       ) : icon ? (
-        <span className="material-symbols-outlined text-[18px]">{icon}</span>
+        <span className={cn("material-symbols-outlined", size === "xs" ? "text-[14px]" : "text-[18px]")}>{icon}</span>
       ) : null}
       {children}
       {iconRight && !loading && (
-        <span className="material-symbols-outlined text-[18px]">{iconRight}</span>
+        <span className={cn("material-symbols-outlined", size === "xs" ? "text-[14px]" : "text-[18px]")}>{iconRight}</span>
       )}
     </button>
   );
